@@ -21,23 +21,23 @@ export const SponsorBanner: React.FC<SponsorBannerProps> = ({
       }`}
       aria-label="Developer Sponsor Advertisement"
     >
-      <div className="w-full px-3.5 py-2 sm:px-5 sm:py-2.5 flex items-center justify-between gap-3 text-xs sm:text-[13px]">
+      <div className="w-full px-3 py-2 sm:px-5 sm:py-2.5 flex items-center justify-between gap-2 sm:gap-3 text-xs sm:text-[13px]">
         {/* Left: Dynamic Config Logo + Brand Name */}
-        <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+        <div className="flex items-center gap-1.5 shrink-0">
           {config.logoUrl && (
             <img 
               src={config.logoUrl} 
               alt={`${config.name} Logo`} 
-              className="w-5 h-5 sm:w-6 sm:h-6 object-contain shrink-0"
+              className="w-5 h-5 sm:w-7 sm:h-7 object-contain shrink-0"
             />
           )}
-          <span className="font-bold text-sm sm:text-base tracking-tight text-white font-sans lowercase">
+          <span className="font-semibold text-xs sm:text-[15px] tracking-tight text-zinc-100 font-sans">
             {config.name}
           </span>
         </div>
 
         {/* Center: Dynamic Config Title / Headline */}
-        <div className="hidden sm:block text-xs sm:text-sm text-zinc-300 font-sans font-normal truncate max-w-xl">
+        <div className="text-[11px] sm:text-sm text-zinc-300 font-sans font-normal truncate max-w-[140px] xs:max-w-[220px] sm:max-w-xl">
           {config.title}
         </div>
 
@@ -46,12 +46,12 @@ export const SponsorBanner: React.FC<SponsorBannerProps> = ({
           <a
             href={config.actionUrl}
             target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 font-semibold text-[#3ECF8E] hover:text-[#52e5a4] transition-colors group underline-offset-4 hover:underline font-sans text-xs sm:text-sm"
+            rel="nofollow noopener noreferrer"
+            className="inline-flex items-center gap-1 sm:gap-1.5 font-semibold text-[#ff5722] hover:text-[#ff7043] transition-colors group underline-offset-4 hover:underline font-sans text-xs sm:text-sm"
           >
             <span>{config.actionText}</span>
             <svg 
-              className="w-3.5 h-3.5 transition-transform duration-150 group-hover:translate-x-0.5" 
+              className="w-3 h-3 sm:w-3.5 sm:h-3.5 transition-transform duration-150 group-hover:translate-x-0.5" 
               fill="none" 
               stroke="currentColor" 
               viewBox="0 0 24 24"

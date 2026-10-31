@@ -8,23 +8,23 @@
 export interface SponsorConfig {
   /** Set to true to show the banner ad at the bottom of the playground */
   enabled: boolean;
-  /** Brand Name (e.g., "Supabase", "Neon") */
+  /** Brand Name (e.g., "Adsterra", "Supabase", "Neon") */
   name: string;
-  /** Logo Image URL or relative asset path (e.g., "/assets/images/logo.png") */
+  /** Logo Image URL or relative asset path (e.g., "/assets/aistudio/image_366554e8.png") */
   logoUrl: string;
   /** Banner headline / offering description */
   title: string;
-  /** Call-to-action button/link text (e.g., "Try for free") */
+  /** Call-to-action button/link text (e.g., "Join Adsterra") */
   actionText: string;
-  /** Destination affiliate link URL */
+  /** Destination affiliate / referral link URL */
   actionUrl: string;
 }
 
 export const sponsorConfig: SponsorConfig = {
-  enabled: false, // Set to true when you want to display your affiliate banner
-  name: 'Supabase',
-  logoUrl: '/assets/images/logo.png',
-  title: 'Build full-stack web apps faster with serverless Postgres, Auth & Realtime.',
-  actionText: 'Try for free',
-  actionUrl: 'https://supabase.com',
+  enabled: true,
+  name: 'Adsterra',
+  logoUrl: '/assets/aistudio/image_366554e8.png',
+  title: 'Monetize your web traffic with high eCPMs & instant payouts.',
+  actionText: 'Join Adsterra',
+  actionUrl: 'https://beta.publishers.adsterra.com/referral/FubRx1gR7F',
 };

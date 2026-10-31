@@ -166,25 +166,59 @@ export default function App() {
     }
   };
 
-  // Split divider drag handler
-  const handleMouseDown = () => {
-    isDraggingRef.current = true;
-    document.body.style.cursor = 'col-resize';
-    document.body.style.userSelect = 'none';
-  };
+  // Track reactive mobile state for responsive layout
+  const [isMobile, setIsMobile] = useState<boolean>(() => {
+    return typeof window !== 'undefined' ? window.innerWidth < 768 : false;
+  });
 
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Split divider drag handler (Mouse & Touch for Desktop & Mobile)
+  const handleStartDrag = useCallback(() => {
+    isDraggingRef.current = true;
+    document.body.style.cursor = isMobile ? 'row-resize' : 'col-resize';
+    document.body.style.userSelect = 'none';
+  }, [isMobile]);
+
+  useEffect(() => {
+    const handleMove = (clientX: number, clientY: number) => {
       if (!isDraggingRef.current || !splitContainerRef.current) return;
       const rect = splitContainerRef.current.getBoundingClientRect();
-      const clientX = e.clientX - rect.left;
-      const percentage = (clientX / rect.width) * 100;
-      if (percentage >= 20 && percentage <= 80) {
-        setSplitRatio(percentage);
+      
+      let percentage = 50;
+      if (isMobile) {
+        // Vertical split on mobile
+        const offset = clientY - rect.top;
+        percentage = (offset / rect.height) * 100;
+      } else {
+        // Horizontal split on desktop
+        const offset = clientX - rect.left;
+        percentage = (offset / rect.width) * 100;
+      }
+
+      // Clamped strictly between 20% and 80% (Limited bounds so panes never collapse)
+      const clamped = Math.min(Math.max(percentage, 20), 80);
+      setSplitRatio(clamped);
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      handleMove(e.clientX, e.clientY);
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches && e.touches.length > 0) {
+        handleMove(e.touches[0].clientX, e.touches[0].clientY);
       }
     };
 
-    const handleMouseUp = () => {
+    const handleEndDrag = () => {
       if (isDraggingRef.current) {
         isDraggingRef.current = false;
         document.body.style.cursor = '';
@@ -193,12 +227,17 @@ export default function App() {
     };
 
     window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('mouseup', handleEndDrag);
+    window.addEventListener('touchmove', handleTouchMove, { passive: true });
+    window.addEventListener('touchend', handleEndDrag);
+
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('mouseup', handleEndDrag);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleEndDrag);
     };
-  }, []);
+  }, [isMobile]);
 
   // Web mode active code helper
   const currentWebCode = activeWebTab === 'html'
@@ -245,15 +284,19 @@ export default function App() {
         onToggleTheme={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
       />
 
-      {/* Main Playground Workspace: fills screen under header, never scrolls */}
+      {/* Main Playground Workspace: Vertical split on mobile; Resizable horizontal split on desktop */}
       <main 
         ref={splitContainerRef}
-        className="flex-1 w-full p-2.5 sm:p-3 md:p-4 flex gap-3 overflow-hidden relative select-none"
+        className="flex-1 w-full p-2 sm:p-3 md:p-4 flex flex-col md:flex-row gap-1 sm:gap-2 md:gap-3 overflow-hidden relative select-none"
       >
-        {/* Left Card: Code Editor */}
+        {/* Top (Mobile) / Left (Desktop) Card: Code Editor */}
         <div 
-          className="h-full flex flex-col overflow-hidden"
-          style={{ width: `${splitRatio}%` }}
+          className="flex flex-col overflow-hidden transition-none shrink-0"
+          style={
+            isMobile 
+              ? { height: `${splitRatio}%`, width: '100%' }
+              : { width: `${splitRatio}%`, height: '100%' }
+          }
         >
           {mode === 'js' ? (
             <CodeEditor
@@ -282,17 +325,32 @@ export default function App() {
           )}
         </div>
 
-        {/* Draggable Divider Handle */}
-        <div
-          onMouseDown={handleMouseDown}
-          className="w-1.5 hover:w-2 bg-transparent hover:bg-zinc-600/50 cursor-col-resize transition-all z-20 shrink-0 self-stretch rounded-full"
-          title="Drag to resize panes"
-        />
+        {/* Resizer Handle: Touch & Mouse Draggable on Mobile & Desktop */}
+        {isMobile ? (
+          <div
+            onMouseDown={handleStartDrag}
+            onTouchStart={handleStartDrag}
+            className="w-full h-3 py-1 flex items-center justify-center cursor-row-resize z-20 shrink-0 touch-none group"
+            title="Drag vertically to resize editor and console"
+          >
+            <div className="h-1 w-12 bg-zinc-700/80 group-hover:bg-[#ff5722] rounded-full transition-colors shadow-sm" />
+          </div>
+        ) : (
+          <div
+            onMouseDown={handleStartDrag}
+            className="w-2 hover:w-2.5 bg-transparent hover:bg-zinc-600/50 cursor-col-resize transition-all z-20 shrink-0 self-stretch rounded-full"
+            title="Drag horizontally to resize editor and console"
+          />
+        )}
 
-        {/* Right Card: Beside Console / Output */}
+        {/* Bottom (Mobile) / Right (Desktop) Card: Terminal / Console / Output */}
         <div 
-          className="h-full flex flex-col overflow-hidden flex-1"
-          style={{ width: `${100 - splitRatio}%` }}
+          className="flex flex-col overflow-hidden flex-1 transition-none shrink-0"
+          style={
+            isMobile 
+              ? { height: `${100 - splitRatio}%`, width: '100%' }
+              : { width: `${100 - splitRatio}%`, height: '100%' }
+          }
         >
           {mode === 'js' ? (
             <ConsoleView
