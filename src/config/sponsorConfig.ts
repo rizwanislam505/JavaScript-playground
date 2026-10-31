@@ -10,7 +10,7 @@ export interface SponsorConfig {
   enabled: boolean;
   /** Brand Name (e.g., "Adsterra", "Supabase", "Neon") */
   name: string;
-  /** Logo Image URL or relative asset path (e.g., "/assets/aistudio/image_366554e8.png") */
+  /** Logo Image URL or relative asset path (e.g., "/assets/images/image_366554e8.png") */
   logoUrl: string;
   /** Banner headline / offering description */
   title: string;
@@ -23,7 +23,7 @@ export interface SponsorConfig {
 export const sponsorConfig: SponsorConfig = {
   enabled: true,
   name: 'Adsterra',
-  logoUrl: '/assets/aistudio/image_366554e8.png',
+  logoUrl: '/assets/images/image_366554e8.png',
   title: 'Monetize your web traffic with high eCPMs & instant payouts.',
   actionText: 'Join Adsterra',
   actionUrl: 'https://beta.publishers.adsterra.com/referral/FubRx1gR7F',
