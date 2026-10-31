@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JavaScript Playground &amp; JS Playground – Online JavaScript Editor &amp; Run JavaScript Online</title>
+    <link rel="canonical" href="https://playground.js.org/" />
+    
+    <!-- Early protection for window.fetch against strict-mode Chrome extension overrides and unhandled extension exceptions -->
+    <script>
+      (function() {
+        try {
+          var _nativeFetch = window.fetch ? window.fetch.bind(window) : undefined;
+          var _customFetch = _nativeFetch;
+
+          if (typeof Window !== 'undefined' && Window.prototype) {
+            try {
+              Object.defineProperty(Window.prototype, 'fetch', {
+                get: function() { return _customFetch; },
+                set: function(v) { _customFetch = v; },
+                configurable: true,
+                enumerable: true
+              });
+            } catch(e) {}
+          }
+
+          try {
+            Object.defineProperty(window, 'fetch', {
+              get: function() { return _customFetch; },
+              set: function(v) { _customFetch = v; },
+              configurable: true,
+              enumerable: true
+            });
+          } catch(e) {}
+        } catch(e) {}
+
+        // Global early capture filter for chrome-extension errors
+        window.addEventListener('error', function(event) {
+          if (!event) return;
+          var filename = event.filename || '';
+          var message = (event.message || '') + (event.error ? ' ' + (event.error.stack || event.error.message) : '');
+          if (
+            filename.indexOf('chrome-extension:') !== -1 ||
+            filename.indexOf('moz-extension:') !== -1 ||
+            filename.indexOf('frame_ant') !== -1 ||
+            message.indexOf('Cannot set property fetch') !== -1 ||
+            message.indexOf('frame_ant') !== -1
+          ) {
+            if (event.preventDefault) event.preventDefault();
+            if (event.stopImmediatePropagation) event.stopImmediatePropagation();
+            return true;
+          }
+        }, true);
+
+        window.addEventListener('unhandledrejection', function(event) {
+          if (!event) return;
+          var reason = event.reason ? (event.reason.stack || event.reason.message || String(event.reason)) : '';
+          if (
+            reason.indexOf('chrome-extension:') !== -1 ||
+            reason.indexOf('Cannot set property fetch') !== -1 ||
+            reason.indexOf('frame_ant') !== -1
+          ) {
+            if (event.preventDefault) event.preventDefault();
+            if (event.stopImmediatePropagation) event.stopImmediatePropagation();
+            return true;
+          }
+        }, true);
+      })();
+    </script>
+    <meta name="description" content="JavaScript Playground &amp; JS Playground: Free online JavaScript editor to run JavaScript online with an instant JavaScript compiler online, REPL, and real-time DevTools console." />
+    <meta name="keywords" content="JavaScript playground, JS playground, online JavaScript editor, run JavaScript online, JavaScript compiler online, js playground online, javascript playground online, online javascript compiler, run js online, javascript editor online, run js code online, online javascript runner, test javascript online, javascript sandbox online, js repl, html css js sandbox, jsfiddle alternative, in-browser javascript compiler, free javascript compiler, devtools console" />
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <meta name="author" content="JS Playground" />
+    <meta name="publisher" content="JS Playground" />
+    <meta name="theme-color" content="#080a0f" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="application-name" content="JS Playground" />
+    <meta name="apple-mobile-web-app-title" content="JS Playground" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <!-- Favicon & Browser Tab Icons -->
+    <link rel="icon" type="image/png" href="/assets/images/logo.png" />
+    <link rel="shortcut icon" href="/assets/images/logo.png" />
+    <link rel="apple-touch-icon" href="/assets/images/logo.png" />
+
+    <!-- OpenGraph Social Cards -->
+    <meta property="og:site_name" content="JS Playground" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://playground.js.org/" />
+    <meta property="og:title" content="JavaScript Playground &amp; JS Playground – Online JavaScript Editor &amp; Run JavaScript Online" />
+    <meta property="og:description" content="Free online JavaScript playground and JS playground: online JavaScript editor to run JavaScript online with an instant JavaScript compiler online." />
+    <meta property="og:image" content="https://playground.js.org/assets/images/logo.png" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter / X Social Cards -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://playground.js.org/" />
+    <meta name="twitter:title" content="JavaScript Playground &amp; JS Playground – Online JavaScript Editor &amp; Run JavaScript Online" />
+    <meta name="twitter:description" content="Free online JavaScript playground and JS playground: online JavaScript editor to run JavaScript online with an instant JavaScript compiler online." />
+    <meta name="twitter:image" content="https://playground.js.org/assets/images/logo.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300..700;1,300..700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Rich Schema.org Structured Data (JSON-LD) for Search Crawlers & Bots -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://playground.js.org/#website",
+          "url": "https://playground.js.org/",
+          "name": "JavaScript Playground & JS Playground",
+          "alternateName": ["JavaScript Playground", "JS Playground", "Online JavaScript Editor", "Run JavaScript Online", "JavaScript Compiler Online"],
+          "description": "Free online JavaScript playground and JS playground: online JavaScript editor to run JavaScript online with instant compiler.",
+          "inLanguage": "en-US"
+        },
+        {
+          "@type": "WebApplication",
+          "@id": "https://playground.js.org/#webapplication",
+          "url": "https://playground.js.org/",
+          "name": "JavaScript Playground & JS Playground",
+          "alternateName": [
+            "JavaScript Playground",
+            "JS Playground",
+            "Online JavaScript Editor",
+            "Run JavaScript Online",
+            "JavaScript Compiler Online",
+            "JS REPL Online"
+          ],
+          "applicationCategory": "DeveloperApplication",
+          "operatingSystem": "All modern web browsers (Chrome, Firefox, Safari, Edge)",
+          "description": "Free high-performance JavaScript playground, JS playground, online JavaScript editor, and JavaScript compiler online to run JavaScript online with zero latency.",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "keywords": "JavaScript playground, JS playground, online JavaScript editor, run JavaScript online, JavaScript compiler online, js playground online, javascript playground online, online javascript compiler, run js online",
+          "featureList": [
+            "Instant client-side JavaScript execution with zero latency and no server overhead",
+            "Interactive DevTools Console with expandable object trees, array explorers, and console.table()",
+            "First-class support for modern ECMAScript, top-level await, and native fetch() requests",
+            "Automatic trailing expression evaluation and return value indicator (<-)",
+            "Interactive REPL prompt with history navigation (Arrow Up/Down)",
+            "Split-view dual mode: Pure JavaScript logic or full Web stack (HTML5, CSS3, JS) with live preview",
+            "File upload and automatic code formatting for .js, .json, .ts, .html, and .css files",
+            "100% private client-side execution with zero tracking or telemetry"
+          ],
+          "softwareRequirements": "ECMAScript 6+ compatible web browser"
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "What is JavaScript Playground?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "JavaScript Playground is a free, instant online JavaScript compiler, REPL, and web coding sandbox. It enables developers, learners, and engineers to write, run, test, and debug JavaScript snippets directly in their browser without installing Node.js or setting up build tools."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How does the online JavaScript compiler execute code?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Code executes directly inside your browser runtime using asynchronous function scopes and modern JavaScript engines (V8, SpiderMonkey, JavaScriptCore). This ensures 100% privacy, instantaneous execution with zero network latency, and complete security."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Can I use top-level await and the fetch API?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes. The JavaScript Playground natively supports top-level await and modern Web APIs including fetch(), setTimeout(), Promise, URL, and async iterators. You can make HTTP requests to any public CORS-enabled API directly from your snippet."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Why don't I need to call console.log() to see results?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Similar to Chrome DevTools and Node.js REPL, the playground automatically evaluates trailing expressions (e.g., 2 + 2 or [1, 2, 3].map(x => x * 2)) and displays the resulting value with a return arrow indicator in the console."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How does Web mode work for HTML, CSS, and JavaScript?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Switching to Web mode provides separate tabs for HTML, CSS, and JavaScript. The application renders a live preview in a secure sandbox while capturing all script logs, warnings, and errors directly in the unified Console tab."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Is my code secure and private?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes, 100%. All execution, compilation, and evaluation happen locally on your computer inside your browser tab. Your code is never transmitted to, stored on, or processed by any external server."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What keyboard shortcuts are available?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Press Ctrl + Enter (or Cmd + Enter on macOS) anywhere in the editor to immediately execute your code. You can also use Tab and Shift + Tab for smart indentation, and Enter for automatic auto-indentation."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How does the interactive REPL command line work?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "At the bottom of the Console card, you can type single-line or multi-line expressions into the REPL prompt (>). Press Enter to evaluate instantly, and use the Arrow Up and Arrow Down keys to navigate through your command history."
+              }
+            }
+          ]
+        },
+        {
+          "@type": "HowTo",
+          "name": "How to Run and Debug JavaScript Online",
+          "description": "Step-by-step guide to testing JavaScript snippets and web components instantly in your browser.",
+          "step": [
+            {
+              "@type": "HowToStep",
+              "name": "Select Mode",
+              "text": "Choose 'JS' mode for pure JavaScript logic or 'Web' mode to build HTML, CSS, and JavaScript interfaces."
+            },
+            {
+              "@type": "HowToStep",
+              "name": "Write or Paste Code",
+              "text": "Type or paste your JavaScript code into the left editor pane. You can also upload existing .js or .json files."
+            },
+            {
+              "@type": "HowToStep",
+              "name": "Execute Code",
+              "text": "Click the Run play button in the editor header or press Ctrl + Enter / Cmd + Enter."
+            },
+            {
+              "@type": "HowToStep",
+              "name": "Inspect Output in Real-Time Console",
+              "text": "Examine formatted logs, errors, deep object hierarchies, and evaluation values in the interactive right console."
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+  </head>
+  <body class="bg-[#080a0f] text-slate-100 antialiased h-screen w-screen overflow-hidden selection:bg-yellow-500/30 selection:text-white">
+    <div id="root" class="h-screen w-screen overflow-hidden flex flex-col"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
