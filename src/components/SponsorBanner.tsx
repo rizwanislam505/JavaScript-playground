@@ -23,15 +23,15 @@ export const SponsorBanner: React.FC<SponsorBannerProps> = ({
     >
       <div className="w-full px-3 py-2 sm:px-5 sm:py-2.5 flex items-center justify-between gap-2 sm:gap-3 text-xs sm:text-[13px]">
         {/* Left: Dynamic Config Logo + Brand Name */}
-        <div className="flex items-center gap-1.5 shrink-0">
+        <div className="flex items-center gap-1 shrink-0">
           {config.logoUrl && (
             <img 
               src={config.logoUrl} 
               alt={`${config.name} Logo`} 
-              className="w-5 h-5 sm:w-7 sm:h-7 object-contain shrink-0"
+              className="w-7 h-7 sm:w-8 sm:h-8 object-contain shrink-0"
             />
           )}
-          <span className="font-semibold text-xs sm:text-[15px] tracking-tight text-zinc-100 font-sans">
+          <span className="font-semibold text-xs sm:text-[15px] tracking-tight text-zinc-100 font-sans shrink-0">
             {config.name}
           </span>
         </div>
