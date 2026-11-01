@@ -1,20 +1,101 @@
 SOURCE-AVAILABLE VIEW-ONLY LICENSE
 
-Copyright (c) 2026 JS Playground (playground.js.org). All Rights Reserved.
+Copyright (c) 2026 JS Playground (playground.js.org).
+All Rights Reserved.
 
 TERMS AND CONDITIONS FOR USE, INSPECTION, AND INSPIRATION
 
 1. PERMITTED RIGHTS (VIEWING & INSPIRATION)
-You are granted a non-exclusive, non-transferable, royalty-free license to view, read, analyze, and inspect the source code and files in this repository for educational purposes, personal study, and architectural inspiration.
 
-2. RESTRICTIONS (NO COPYING, RE-HOSTING, OR RE-DISTRIBUTION)
-You are STRICTLY PROHIBITED from doing any of the following without prior written permission from the copyright holder:
-   a. Copying, cloning, duplicating, or replicating any part of the codebase, source code, or media files for public deployment, re-hosting, or commercial distribution.
-   b. Selling, sublicensing, leasing, or monetizing any portion of this software or its derivative works.
-   c. Creating public forks or copies for the purpose of operating a competing service or site.
+You are granted a limited, non-exclusive, non-transferable, revocable, royalty-free permission to access, view, read, study, analyze, and inspect the publicly available source code and files in this repository solely for educational purposes, personal learning, and architectural inspiration.
+
+You may learn from general programming concepts, development techniques, and architectural approaches demonstrated in the project, provided that you do not reproduce or reuse protected portions of the original implementation.
+
+No other rights are granted or implied under this license.
+
+2. RESTRICTIONS (NO COPYING, MODIFICATION, OR REDISTRIBUTION)
+
+Without prior explicit written permission from the copyright holder, you are STRICTLY PROHIBITED from:
+
+   a. COPYING OR REPRODUCTION:
+   Copying, reproducing, duplicating, extracting, or substantially replicating any portion of the source code, project files, assets, or other protected materials.
+
+   b. MODIFICATION AND DERIVATIVE WORKS:
+   Modifying, adapting, translating, altering, or creating derivative works based on the source code or other protected materials.
+
+   c. RE-HOSTING AND DEPLOYMENT:
+   Publishing, deploying, hosting, or operating copies or substantially reproduced versions of this software on public or private platforms.
+
+   d. REDISTRIBUTION:
+   Redistributing, republishing, sublicensing, sharing, or making copies of the source code or project files available through other repositories, websites, platforms, or distribution channels.
+
+   e. COMMERCIAL USE:
+   Selling, licensing, leasing, monetizing, commercially distributing, or otherwise exploiting any portion of the software or its derivative works.
+
+   f. COMPETING PRODUCTS:
+   Using copied or substantially reproduced portions of this codebase to develop, operate, distribute, or maintain a competing JavaScript playground, code editor, or substantially similar software service.
+
+   g. UNAUTHORIZED FORKING:
+   Creating, maintaining, or publishing public or private forks containing copied or modified project materials without prior written authorization.
+
+   h. OWNERSHIP MISREPRESENTATION:
+   Removing, modifying, concealing, or misrepresenting copyright notices, ownership statements, or attribution information associated with the project.
+
+   i. UNAUTHORIZED INTEGRATION:
+   Incorporating protected source code, assets, or substantial portions of the implementation into another application, website, software product, or development project.
 
 3. RESERVATION OF RIGHTS
-All title, ownership, intellectual property rights, logo assets, UI design, and copyright in and to the Software remain exclusively with the copyright holder.
 
-4. DISCLAIMER OF WARRANTY
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY.
+All rights, title, ownership, and intellectual property interests in and to the original software and its associated materials remain exclusively with the copyright holder.
+
+This includes, but is not limited to:
+
+   - Original source code and software implementation.
+   - Project-specific architecture and code structure.
+   - Original interface components and visual assets.
+   - Custom styling, layouts, and design elements.
+   - Documentation and original written materials.
+   - Project branding, logos, and associated assets.
+
+Nothing in this license shall be interpreted as transferring ownership, granting an unrestricted license, or providing any implied authorization to use the protected materials.
+
+Third-party libraries, dependencies, and externally licensed materials remain subject to their respective licenses and terms.
+
+4. NO OPEN-SOURCE LICENSE
+
+This repository is NOT released under an OSI-approved open-source license.
+
+Public accessibility of the repository does not constitute permission to copy, modify, fork, redistribute, commercially exploit, or otherwise reuse its protected materials.
+
+The ability to view or access the source code must not be interpreted as a grant of rights beyond those explicitly provided in Section 1.
+
+5. PERMISSIONS AND AUTHORIZATION
+
+Any activity not expressly permitted under this license is prohibited unless separately authorized in writing by the copyright holder.
+
+Requests for permission involving reproduction, modification, redistribution, commercial use, integration, or other forms of reuse must receive explicit written approval before the activity takes place.
+
+Access to this repository, the absence of enforcement, or the submission of a GitHub issue or pull request does not constitute authorization.
+
+6. VIOLATIONS AND ENFORCEMENT
+
+Unauthorized use, reproduction, modification, distribution, or exploitation of protected materials may constitute copyright infringement or other violations of applicable intellectual property laws.
+
+The copyright holder reserves all rights and remedies available under applicable law, including requesting the removal of unauthorized copies, distributions, and deployments.
+
+7. DISCLAIMER OF WARRANTY
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT.
+
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY ARISING FROM THE SOFTWARE OR ITS USE, TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW.
+
+8. ACCEPTANCE OF TERMS
+
+By accessing, viewing, or inspecting this repository, you acknowledge that you have read and understood the conditions and restrictions outlined in this license.
+
+If you do not agree with these terms, you must discontinue access to and use of the repository.
+
+END OF LICENSE
+
+Copyright (c) 2026 JS Playground (playground.js.org).
+All Rights Reserved.
