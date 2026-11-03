@@ -297,15 +297,13 @@ export const ConsoleView: React.FC<ConsoleViewProps> = ({
             </button>
           )}
 
-          {logs.length > 0 && (
-            <button
-              onClick={onClear}
-              className="text-zinc-300 hover:text-rose-400 p-1 rounded hover:bg-zinc-800 transition-colors cursor-pointer"
-              title="Clear console"
-            >
-              <Trash2 className="w-3.5 h-3.5" />
-            </button>
-          )}
+          <button
+            onClick={onClear}
+            className="text-zinc-300 hover:text-rose-400 p-1 rounded hover:bg-zinc-800 transition-colors cursor-pointer"
+            title="Clear console"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
         </div>
       </div>
 

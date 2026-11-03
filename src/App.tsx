@@ -6,7 +6,7 @@ import {
   ConsoleLogEntry, 
   WebProjectState 
 } from './types';
-import { JS_DEFAULT_CODE, WEB_DEFAULT_PROJECT } from './templates';
+import { JS_DEFAULT_CODE, TS_DEFAULT_CODE, WEB_DEFAULT_PROJECT } from './templates';
 import { Header } from './components/Header';
 import { SponsorBanner } from './components/SponsorBanner';
 import { CodeEditor } from './components/CodeEditor';
@@ -29,7 +29,7 @@ export default function App() {
 
   // Raw code state for TypeScript
   const [tsCode, setTsCode] = useState<string>(() => {
-    return safeStorageGet('ts_playground_raw_code') ?? '';
+    return safeStorageGet('ts_playground_raw_code') ?? TS_DEFAULT_CODE;
   });
 
   const [webProject, setWebProject] = useState<WebProjectState>(() => {
@@ -429,7 +429,7 @@ export default function App() {
 
   return (
     <div 
-      className={`h-full w-full flex-1 flex flex-col overflow-hidden font-sans select-none ${
+      className={`h-screen w-screen flex flex-col overflow-hidden font-sans select-none ${
         theme === 'dark' ? 'bg-[#080a0f] text-slate-100' : 'bg-slate-100 text-slate-900'
       }`}
     >
