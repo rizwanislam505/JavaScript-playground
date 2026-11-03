@@ -1,4 +1,5 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
+import { safeStorageClear } from '../utils/storage';
 
 interface Props {
   children: ReactNode;
@@ -33,8 +34,12 @@ export class ErrorBoundary extends Component<Props, State> {
             </p>
             <button
               onClick={() => {
-                localStorage.clear();
-                window.location.href = '/';
+                safeStorageClear();
+                try {
+                  window.location.href = '/';
+                } catch (e) {
+                  window.location.reload();
+                }
               }}
               className="px-4 py-2 bg-yellow-500 hover:bg-yellow-400 text-black font-semibold text-xs rounded-lg transition-colors cursor-pointer"
             >

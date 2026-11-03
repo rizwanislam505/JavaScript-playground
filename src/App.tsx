@@ -13,6 +13,7 @@ import { CodeEditor } from './components/CodeEditor';
 import { ConsoleView } from './components/ConsoleView';
 import { WebPreview } from './components/WebPreview';
 import { executeJavaScript } from './utils/codeRunner';
+import { safeStorageGet, safeStorageSet } from './utils/storage';
 import { AboutPage } from './pages/AboutPage';
 import { PrivacyPage } from './pages/PrivacyPage';
 import { TermsPage } from './pages/TermsPage';
@@ -23,16 +24,16 @@ export default function App() {
 
   // Raw code state for JavaScript
   const [jsCode, setJsCode] = useState<string>(() => {
-    return localStorage.getItem('js_playground_raw_code') ?? JS_DEFAULT_CODE;
+    return safeStorageGet('js_playground_raw_code') ?? JS_DEFAULT_CODE;
   });
 
   // Raw code state for TypeScript
   const [tsCode, setTsCode] = useState<string>(() => {
-    return localStorage.getItem('ts_playground_raw_code') ?? '';
+    return safeStorageGet('ts_playground_raw_code') ?? '';
   });
 
   const [webProject, setWebProject] = useState<WebProjectState>(() => {
-    const saved = localStorage.getItem('web_playground_raw_project');
+    const saved = safeStorageGet('web_playground_raw_project');
     if (saved) {
       try {
         return JSON.parse(saved);
@@ -62,74 +63,88 @@ export default function App() {
 
   // URL Routing: / , /typescript-playground , /about , /privacy-policy , /terms-of-service
   const [currentRoute, setCurrentRoute] = useState<string>(() => {
-    if (typeof window === 'undefined') return '/';
-    const path = window.location.pathname.toLowerCase();
-    const hash = window.location.hash.toLowerCase();
-    if (path.includes('typescript') || hash.includes('typescript')) return '/typescript-playground';
-    if (path.includes('about') || hash.includes('about')) return '/about';
-    if (path.includes('privacy') || hash.includes('privacy')) return '/privacy-policy';
-    if (path.includes('terms') || hash.includes('terms')) return '/terms-of-service';
+    try {
+      if (typeof window !== 'undefined' && window.location) {
+        const path = (window.location.pathname || '').toLowerCase();
+        const hash = (window.location.hash || '').toLowerCase();
+        if (path.includes('typescript') || hash.includes('typescript')) return '/typescript-playground';
+        if (path.includes('about') || hash.includes('about')) return '/about';
+        if (path.includes('privacy') || hash.includes('privacy')) return '/privacy-policy';
+        if (path.includes('terms') || hash.includes('terms')) return '/terms-of-service';
+      }
+    } catch (e) {}
     return '/';
   });
 
   useEffect(() => {
     const handleLocationChange = () => {
-      const path = window.location.pathname.toLowerCase();
-      const hash = window.location.hash.toLowerCase();
+      try {
+        if (typeof window === 'undefined' || !window.location) return;
+        const path = (window.location.pathname || '').toLowerCase();
+        const hash = (window.location.hash || '').toLowerCase();
 
-      if (path.includes('typescript') || hash.includes('typescript')) {
-        setCurrentRoute('/typescript-playground');
-        setMode('ts');
-      } else if (path.includes('about') || hash.includes('about')) {
-        setCurrentRoute('/about');
-      } else if (path.includes('privacy') || hash.includes('privacy')) {
-        setCurrentRoute('/privacy-policy');
-      } else if (path.includes('terms') || hash.includes('terms')) {
-        setCurrentRoute('/terms-of-service');
-      } else {
-        setCurrentRoute('/');
-      }
+        if (path.includes('typescript') || hash.includes('typescript')) {
+          setCurrentRoute('/typescript-playground');
+          setMode('ts');
+        } else if (path.includes('about') || hash.includes('about')) {
+          setCurrentRoute('/about');
+        } else if (path.includes('privacy') || hash.includes('privacy')) {
+          setCurrentRoute('/privacy-policy');
+        } else if (path.includes('terms') || hash.includes('terms')) {
+          setCurrentRoute('/terms-of-service');
+        } else {
+          setCurrentRoute('/');
+        }
+      } catch (e) {}
     };
 
     handleLocationChange();
 
-    window.addEventListener('popstate', handleLocationChange);
-    window.addEventListener('hashchange', handleLocationChange);
-    return () => {
-      window.removeEventListener('popstate', handleLocationChange);
-      window.removeEventListener('hashchange', handleLocationChange);
-    };
+    try {
+      window.addEventListener('popstate', handleLocationChange);
+      window.addEventListener('hashchange', handleLocationChange);
+      return () => {
+        window.removeEventListener('popstate', handleLocationChange);
+        window.removeEventListener('hashchange', handleLocationChange);
+      };
+    } catch (e) {}
   }, []);
 
   // Sync document.title and meta description based on route & mode
   useEffect(() => {
-    let metaDesc = document.querySelector('meta[name="description"]');
-    if (!metaDesc) {
-      metaDesc = document.createElement('meta');
-      metaDesc.setAttribute('name', 'description');
-      document.head.appendChild(metaDesc);
-    }
+    try {
+      let metaDesc = document.querySelector('meta[name="description"]');
+      if (!metaDesc) {
+        metaDesc = document.createElement('meta');
+        metaDesc.setAttribute('name', 'description');
+        document.head.appendChild(metaDesc);
+      }
 
-    if (currentRoute === '/typescript-playground' || mode === 'ts') {
-      document.title = 'TypeScript Playground – Online TypeScript Compiler';
-      metaDesc.setAttribute('content', 'Run TypeScript online in your browser. Free online TypeScript compiler with real-time DevTools console, top-level await, and file drag-and-drop.');
-    } else if (currentRoute === '/about') {
-      document.title = 'About JS Playground – Free Online Code Editor';
-      metaDesc.setAttribute('content', 'Learn about JS Playground, a zero-latency, privacy-first online JavaScript and TypeScript editor running 100% in your browser.');
-    } else if (currentRoute === '/privacy-policy') {
-      document.title = 'Privacy Policy – JS Playground';
-      metaDesc.setAttribute('content', 'JS Playground Privacy Policy. Learn about our 100% client-side execution, zero code tracking, and local storage safety.');
-    } else if (currentRoute === '/terms-of-service') {
-      document.title = 'Terms of Service – JS Playground';
-      metaDesc.setAttribute('content', 'JS Playground Terms of Service. Review user code ownership, platform disclaimers, and acceptable use guidelines.');
-    } else {
-      document.title = 'JS Playground – Online JavaScript & TypeScript Editor';
-      metaDesc.setAttribute('content', 'Free online JavaScript & TypeScript playground. Run code instantly in your browser with a DevTools console, top-level await, and zero setup.');
-    }
+      if (currentRoute === '/typescript-playground' || mode === 'ts') {
+        document.title = 'TypeScript Playground – Online TypeScript Compiler';
+        metaDesc.setAttribute('content', 'Run TypeScript online in your browser. Free online TypeScript compiler with real-time DevTools console, top-level await, and file drag-and-drop.');
+      } else if (currentRoute === '/about') {
+        document.title = 'About JS Playground – Free Online Code Editor';
+        metaDesc.setAttribute('content', 'Learn about JS Playground, a zero-latency, privacy-first online JavaScript and TypeScript editor running 100% in your browser.');
+      } else if (currentRoute === '/privacy-policy') {
+        document.title = 'Privacy Policy – JS Playground';
+        metaDesc.setAttribute('content', 'JS Playground Privacy Policy. Learn about our 100% client-side execution, zero code tracking, and local storage safety.');
+      } else if (currentRoute === '/terms-of-service') {
+        document.title = 'Terms of Service – JS Playground';
+        metaDesc.setAttribute('content', 'JS Playground Terms of Service. Review user code ownership, platform disclaimers, and acceptable use guidelines.');
+      } else {
+        document.title = 'JS Playground – Online JavaScript & TypeScript Editor';
+        metaDesc.setAttribute('content', 'Free online JavaScript & TypeScript playground. Run code instantly in your browser with a DevTools console, top-level await, and zero setup.');
+      }
+    } catch (e) {}
   }, [currentRoute, mode]);
 
   const navigate = (path: string) => {
-    window.history.pushState({}, '', path);
+    try {
+      if (typeof window !== 'undefined' && window.history) {
+        window.history.pushState({}, '', path);
+      }
+    } catch (e) {}
     setCurrentRoute(path);
     if (path.includes('typescript')) {
       setMode('ts');
@@ -138,37 +153,43 @@ export default function App() {
 
   const handleModeChange = (newMode: PlaygroundMode) => {
     setMode(newMode);
-    if (newMode === 'ts') {
-      window.history.pushState({}, '', '/typescript-playground');
-      setCurrentRoute('/typescript-playground');
-    } else if (newMode === 'js') {
-      window.history.pushState({}, '', '/');
-      setCurrentRoute('/');
-    } else if (newMode === 'web') {
-      setActiveRightTab('output');
-      window.history.pushState({}, '', '/');
-      setCurrentRoute('/');
+    try {
+      if (typeof window !== 'undefined' && window.history) {
+        if (newMode === 'ts') {
+          window.history.pushState({}, '', '/typescript-playground');
+          setCurrentRoute('/typescript-playground');
+        } else if (newMode === 'js') {
+          window.history.pushState({}, '', '/');
+          setCurrentRoute('/');
+        } else if (newMode === 'web') {
+          setActiveRightTab('output');
+          window.history.pushState({}, '', '/');
+          setCurrentRoute('/');
+        }
+      }
+    } catch (e) {
+      setCurrentRoute(newMode === 'ts' ? '/typescript-playground' : '/');
     }
   };
 
-  // Persist code changes with debouncing
+  // Persist code changes safely with debouncing
   useEffect(() => {
     const handler = setTimeout(() => {
-      localStorage.setItem('js_playground_raw_code', jsCode);
+      safeStorageSet('js_playground_raw_code', jsCode);
     }, 400);
     return () => clearTimeout(handler);
   }, [jsCode]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
-      localStorage.setItem('ts_playground_raw_code', tsCode);
+      safeStorageSet('ts_playground_raw_code', tsCode);
     }, 400);
     return () => clearTimeout(handler);
   }, [tsCode]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
-      localStorage.setItem('web_playground_raw_project', JSON.stringify(webProject));
+      safeStorageSet('web_playground_raw_project', JSON.stringify(webProject));
     }, 400);
     return () => clearTimeout(handler);
   }, [webProject]);
@@ -408,7 +429,7 @@ export default function App() {
 
   return (
     <div 
-      className={`h-screen w-screen flex flex-col overflow-hidden font-sans select-none ${
+      className={`h-full w-full flex-1 flex flex-col overflow-hidden font-sans select-none ${
         theme === 'dark' ? 'bg-[#080a0f] text-slate-100' : 'bg-slate-100 text-slate-900'
       }`}
     >
