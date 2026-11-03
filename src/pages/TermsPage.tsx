@@ -6,14 +6,14 @@ interface PageProps {
 
 export const TermsPage: React.FC<PageProps> = ({ onNavigate }) => {
   useEffect(() => {
-    document.title = 'Terms of Service – JS Playground (jsplayground.js.org)';
+    document.title = 'Terms of Service – JS Playground';
     let metaDesc = document.querySelector('meta[name="description"]');
     if (!metaDesc) {
       metaDesc = document.createElement('meta');
       metaDesc.setAttribute('name', 'description');
       document.head.appendChild(metaDesc);
     }
-    metaDesc.setAttribute('content', 'Review the Terms of Service for JS Playground (jsplayground.js.org). Learn about user code ownership, acceptable use, and platform terms.');
+    metaDesc.setAttribute('content', 'JS Playground Terms of Service. Review user code ownership, platform disclaimers, and acceptable use guidelines.');
     window.scrollTo(0, 0);
   }, []);
 

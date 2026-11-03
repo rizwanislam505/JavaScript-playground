@@ -101,18 +101,30 @@ export default function App() {
     };
   }, []);
 
-  // Sync document.title based on route & mode
+  // Sync document.title and meta description based on route & mode
   useEffect(() => {
+    let metaDesc = document.querySelector('meta[name="description"]');
+    if (!metaDesc) {
+      metaDesc = document.createElement('meta');
+      metaDesc.setAttribute('name', 'description');
+      document.head.appendChild(metaDesc);
+    }
+
     if (currentRoute === '/typescript-playground' || mode === 'ts') {
-      document.title = 'TypeScript Playground – Free Online TypeScript Editor & Compiler (jsplayground.js.org)';
+      document.title = 'TypeScript Playground – Online TypeScript Compiler';
+      metaDesc.setAttribute('content', 'Run TypeScript online in your browser. Free online TypeScript compiler with real-time DevTools console, top-level await, and file drag-and-drop.');
     } else if (currentRoute === '/about') {
-      document.title = 'About JS Playground – Free Online JavaScript Editor & REPL (jsplayground.js.org)';
+      document.title = 'About JS Playground – Free Online Code Editor';
+      metaDesc.setAttribute('content', 'Learn about JS Playground, a zero-latency, privacy-first online JavaScript and TypeScript editor running 100% in your browser.');
     } else if (currentRoute === '/privacy-policy') {
-      document.title = 'Privacy Policy – JS Playground (jsplayground.js.org)';
+      document.title = 'Privacy Policy – JS Playground';
+      metaDesc.setAttribute('content', 'JS Playground Privacy Policy. Learn about our 100% client-side execution, zero code tracking, and local storage safety.');
     } else if (currentRoute === '/terms-of-service') {
-      document.title = 'Terms of Service – JS Playground (jsplayground.js.org)';
+      document.title = 'Terms of Service – JS Playground';
+      metaDesc.setAttribute('content', 'JS Playground Terms of Service. Review user code ownership, platform disclaimers, and acceptable use guidelines.');
     } else {
-      document.title = 'JavaScript Playground & JS Playground – Online JavaScript Editor & Run JavaScript Online';
+      document.title = 'JS Playground – Online JavaScript & TypeScript Editor';
+      metaDesc.setAttribute('content', 'Free online JavaScript & TypeScript playground. Run code instantly in your browser with a DevTools console, top-level await, and zero setup.');
     }
   }, [currentRoute, mode]);
 

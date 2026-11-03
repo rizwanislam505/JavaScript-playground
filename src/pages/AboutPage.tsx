@@ -6,14 +6,14 @@ interface PageProps {
 
 export const AboutPage: React.FC<PageProps> = ({ onNavigate }) => {
   useEffect(() => {
-    document.title = 'About JS Playground – Free Online JavaScript & TypeScript Editor (jsplayground.js.org)';
+    document.title = 'About JS Playground – Free Online Code Editor';
     let metaDesc = document.querySelector('meta[name="description"]');
     if (!metaDesc) {
       metaDesc = document.createElement('meta');
       metaDesc.setAttribute('name', 'description');
       document.head.appendChild(metaDesc);
     }
-    metaDesc.setAttribute('content', 'Learn about JS Playground (jsplayground.js.org), a free, zero-latency online JavaScript and TypeScript editor, instant REPL, and web component sandbox.');
+    metaDesc.setAttribute('content', 'Learn about JS Playground, a zero-latency, privacy-first online JavaScript and TypeScript editor running 100% in your browser.');
     window.scrollTo(0, 0);
   }, []);
 

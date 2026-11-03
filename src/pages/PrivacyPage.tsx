@@ -6,14 +6,14 @@ interface PageProps {
 
 export const PrivacyPage: React.FC<PageProps> = ({ onNavigate }) => {
   useEffect(() => {
-    document.title = 'Privacy Policy – JS Playground (jsplayground.js.org)';
+    document.title = 'Privacy Policy – JS Playground';
     let metaDesc = document.querySelector('meta[name="description"]');
     if (!metaDesc) {
       metaDesc = document.createElement('meta');
       metaDesc.setAttribute('name', 'description');
       document.head.appendChild(metaDesc);
     }
-    metaDesc.setAttribute('content', 'Read the Privacy Policy for JS Playground (jsplayground.js.org). Learn about our 100% client-side privacy, zero code tracking, and local storage usage.');
+    metaDesc.setAttribute('content', 'JS Playground Privacy Policy. Learn about our 100% client-side execution, zero code tracking, and local storage safety.');
     window.scrollTo(0, 0);
   }, []);
 
