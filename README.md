@@ -6,7 +6,7 @@
 
 A free, browser-based JavaScript editor and playground designed for writing, executing, and testing JavaScript instantly. Featuring a DevTools-inspired console, real-time code execution, and a dedicated web development environment, JS Playground provides a lightweight coding experience without requiring an account, backend processing, or unnecessary setup.
 
-**Live site:** [playground.js.org](https://playground.js.org/)
+**Live site:** [jsplayground.js.org](https://jsplayground.js.org/)
 
 ---
 
