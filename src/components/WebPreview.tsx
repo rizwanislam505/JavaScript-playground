@@ -19,15 +19,6 @@ export const WebPreview: React.FC<WebPreviewProps> = ({
 }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [reloadKey, setReloadKey] = useState(0);
-  const [autoKey, setAutoKey] = useState(0);
-
-  // Debounced auto-reload so changes reflect cleanly
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setAutoKey(k => k + 1);
-    }, 700);
-    return () => clearTimeout(timer);
-  }, [project.html, project.css, project.js]);
 
   const generatedDoc = `<!DOCTYPE html>
 <html lang="en">
@@ -236,7 +227,7 @@ export const WebPreview: React.FC<WebPreviewProps> = ({
       {/* Main Preview */}
       <div className="relative flex-1 h-full w-full bg-white overflow-hidden">
         <iframe
-          key={`${runTrigger}-${reloadKey}-${autoKey}`}
+          key={`${runTrigger}-${reloadKey}`}
           ref={iframeRef}
           title="Website Output"
           sandbox="allow-scripts allow-modals allow-same-origin"

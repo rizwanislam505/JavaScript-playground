@@ -1,4 +1,4 @@
-export type PlaygroundMode = 'js' | 'web';
+export type PlaygroundMode = 'js' | 'ts' | 'web';
 export type ActiveWebEditorTab = 'html' | 'css' | 'js';
 export type ActiveRightTab = 'output' | 'console';
 

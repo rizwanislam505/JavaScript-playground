@@ -12,6 +12,21 @@ export default defineConfig(() => {
         '@': path.resolve(__dirname, '.'),
       },
     },
+    build: {
+      chunkSizeWarningLimit: 1000,
+      rollupOptions: {
+        output: {
+          manualChunks(id: string) {
+            if (id.includes('node_modules/react') || id.includes('node_modules/react-dom')) {
+              return 'vendor';
+            }
+            if (id.includes('node_modules/prismjs')) {
+              return 'prism';
+            }
+          },
+        },
+      },
+    },
     server: {
       // HMR configuration
       hmr: process.env.DISABLE_HMR !== 'true',

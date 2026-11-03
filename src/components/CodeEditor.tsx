@@ -1,9 +1,9 @@
-import React, { useRef, useEffect, useState, useMemo } from 'react';
+import React, { useRef, useState, useMemo } from 'react';
 import Prism from 'prismjs';
 import 'prismjs/components/prism-javascript';
 import 'prismjs/components/prism-css';
 import 'prismjs/components/prism-markup';
-import { Upload, Trash2, Play, Copy, Check, AlignLeft } from 'lucide-react';
+import { Trash2, Play, Copy, Check, Download, UploadCloud } from 'lucide-react';
 import { PlaygroundMode, ActiveWebEditorTab } from '../types';
 
 interface CodeEditorProps {
@@ -28,18 +28,18 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
   mode,
   activeWebTab = 'html',
   onSelectWebTab,
-  placeholder = 'Paste your JavaScript or upload a file...',
+  placeholder = 'Paste your JavaScript or drop a file',
   isRunning = false
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const preRef = useRef<HTMLPreElement>(null);
   const gutterRef = useRef<HTMLDivElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [activeLine, setActiveLine] = useState<number>(1);
   const [copied, setCopied] = useState<boolean>(false);
+  const [isDraggingOver, setIsDraggingOver] = useState<boolean>(false);
 
-  // Line count and character count calculation
+  // Line and character count calculation
   const lines = useMemo(() => {
     if (!value) return [''];
     return value.split('\n');
@@ -83,9 +83,24 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
     }
   };
 
-  // File Upload
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  // Drag and drop file handling
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingOver(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingOver(false);
+    const file = e.dataTransfer.files?.[0];
     if (!file) return;
 
     const reader = new FileReader();
@@ -96,8 +111,6 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
       }
     };
     reader.readAsText(file);
-    // Reset file input value so same file can be uploaded again if needed
-    e.target.value = '';
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -192,28 +205,33 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
     }
   };
 
-  useEffect(() => {
-    updateActiveLine();
-  }, [value]);
-
   return (
-    <div className="flex flex-col h-full w-full bg-[#0b0d14] rounded-xl border border-[#1e2333] shadow-2xl overflow-hidden">
-      {/* Hidden file input for upload */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept=".js,.ts,.json,.txt,.html,.css"
-        className="hidden"
-        onChange={handleFileUpload}
-      />
+    <div 
+      className="flex flex-col h-full w-full bg-[#0b0d14] rounded-xl border border-[#1e2333] shadow-2xl overflow-hidden relative"
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
+      {/* Clean Drag & Drop Overlay */}
+      {isDraggingOver && (
+        <div className="absolute inset-0 z-30 bg-[#090b10]/95 border-2 border-dashed border-zinc-500 rounded-xl flex items-center justify-center pointer-events-none">
+          <span className="text-sm font-medium text-zinc-300 font-mono tracking-wide px-4 py-2 bg-zinc-900 border border-zinc-700 rounded-lg shadow-lg">
+            Drop file to load code
+          </span>
+        </div>
+      )}
 
-      {/* Card Header matching screenshot */}
+      {/* Card Header */}
       <div className="h-11 bg-[#11141f] border-b border-[#1e2333] px-4 flex items-center justify-between select-none shrink-0">
         {/* Left: Tab / Title */}
         <div className="flex items-center gap-4">
           {mode === 'js' ? (
             <span className="text-sm font-medium text-slate-100 tracking-tight">
               JavaScript
+            </span>
+          ) : mode === 'ts' ? (
+            <span className="text-sm font-medium text-slate-100 tracking-tight">
+              TypeScript
             </span>
           ) : (
             <div className="flex items-center gap-4">
@@ -251,9 +269,9 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
           )}
         </div>
 
-        {/* Right: Run, Upload, Format, Copy, Clear (Trash) */}
+        {/* Right: Run, Copy, Download, Clear */}
         <div className="flex items-center gap-1.5">
-          {/* Run button: only play icon, no run text, no background label, a little bit yellow */}
+          {/* Run button */}
           {onRun && (
             <button
               onClick={onRun}
@@ -269,34 +287,6 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
             </button>
           )}
 
-          {/* Upload Button */}
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="text-zinc-300 hover:text-white p-1.5 rounded-md hover:bg-zinc-800 transition-colors cursor-pointer"
-            title="Upload a file"
-          >
-            <Upload className="w-4 h-4" />
-          </button>
-
-          {/* Format / Beautify Button */}
-          <button
-            onClick={() => {
-              if (!value) return;
-              try {
-                const parsed = JSON.parse(value);
-                onChange(JSON.stringify(parsed, null, 2));
-              } catch (e) {
-                // If not JSON, basic indentation clean up
-                const formatted = value.split('\n').map(l => l.trimEnd()).join('\n');
-                onChange(formatted);
-              }
-            }}
-            className="text-zinc-300 hover:text-white p-1.5 rounded-md hover:bg-zinc-800 transition-colors cursor-pointer"
-            title="Format / Beautify code"
-          >
-            <AlignLeft className="w-4 h-4" />
-          </button>
-
           {/* Copy Button */}
           <button
             onClick={() => {
@@ -309,6 +299,37 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
             title={copied ? "Copied!" : "Copy code"}
           >
             {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+          </button>
+
+          {/* Download Button */}
+          <button
+            onClick={() => {
+              if (!value) return;
+              const ext = mode === 'js'
+                ? 'js'
+                : mode === 'ts'
+                ? 'ts'
+                : activeWebTab === 'html'
+                ? 'html'
+                : activeWebTab === 'css'
+                ? 'css'
+                : 'js';
+              const filename = mode === 'js' ? 'script.js' : mode === 'ts' ? 'main.ts' : `index.${ext}`;
+              const mimeType = ext === 'html' ? 'text/html' : ext === 'css' ? 'text/css' : 'text/javascript';
+              const blob = new Blob([value], { type: mimeType });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = filename;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              URL.revokeObjectURL(url);
+            }}
+            className="text-zinc-300 hover:text-white p-1.5 rounded-md hover:bg-zinc-800 transition-colors cursor-pointer"
+            title="Download code"
+          >
+            <Download className="w-4 h-4" />
           </button>
 
           {/* Clear / Trash Button */}
@@ -377,7 +398,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
             }}
           />
 
-          {/* Real Textarea with Yellow Text Selection Highlight */}
+          {/* Real Textarea */}
           <textarea
             ref={textareaRef}
             value={value}
@@ -398,10 +419,13 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
         </div>
       </div>
 
-      {/* Card Footer matching screenshot: "0 lines, 0 chars" */}
-      <div className="h-7 bg-[#11141f] border-t border-[#1e2333] px-4 flex items-center justify-end select-none shrink-0">
-        <span className="text-[11px] font-mono text-zinc-500 tabular-nums">
-          {lineCount} lines, {charCount} chars
+      {/* Card Footer: Line & Character Counter */}
+      <div className="h-7 bg-[#11141f] border-t border-[#1e2333] px-4 flex items-center justify-between select-none shrink-0">
+        <span className="text-[10px] text-zinc-500 font-mono">
+          Ln {activeLine}
+        </span>
+        <span className="text-[11px] font-mono text-zinc-400 tabular-nums">
+          {lineCount} {lineCount === 1 ? 'line' : 'lines'}, {charCount} {charCount === 1 ? 'character' : 'characters'}
         </span>
       </div>
     </div>

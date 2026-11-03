@@ -1,6 +1,6 @@
 # JS Playground
 
-[![Live Demo](https://img.shields.io/badge/Live-playground.js.org-yellow.svg)](https://playground.js.org/)
+[![Live Demo](https://img.shields.io/badge/Live-jsplayground.js.org-yellow.svg)](https://jsplayground.js.org/)
 [![License](https://img.shields.io/badge/License-Source--Available%20View--Only-emerald.svg)](LICENSE)
 [![Runtime](https://img.shields.io/badge/Runtime-Browser%20Client-blue.svg)]()
 

@@ -244,7 +244,7 @@ export const ConsoleView: React.FC<ConsoleViewProps> = ({
       <div className="h-11 bg-[#11141f] border-b border-[#1e2333] px-4 flex items-center justify-between select-none shrink-0">
         {/* Left: Tab / Title */}
         <div className="flex items-center gap-4">
-          {mode === 'js' ? (
+          {mode === 'js' || mode === 'ts' ? (
             <span className="text-sm font-medium text-white tracking-tight flex items-center gap-2">
               Console
             </span>
@@ -297,13 +297,15 @@ export const ConsoleView: React.FC<ConsoleViewProps> = ({
             </button>
           )}
 
-          <button
-            onClick={onClear}
-            className="text-zinc-300 hover:text-rose-400 p-1 rounded hover:bg-zinc-800 transition-colors cursor-pointer"
-            title="Clear console"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-          </button>
+          {logs.length > 0 && (
+            <button
+              onClick={onClear}
+              className="text-zinc-300 hover:text-rose-400 p-1 rounded hover:bg-zinc-800 transition-colors cursor-pointer"
+              title="Clear console"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
       </div>
 
