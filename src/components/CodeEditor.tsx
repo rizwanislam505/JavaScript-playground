@@ -3,7 +3,7 @@ import Prism from 'prismjs';
 import 'prismjs/components/prism-javascript';
 import 'prismjs/components/prism-css';
 import 'prismjs/components/prism-markup';
-import { Trash2, Play, Copy, Check, Download, UploadCloud } from 'lucide-react';
+import { Trash2, Play, Copy, Check, Download, Share2, AlertCircle } from 'lucide-react';
 import { PlaygroundMode, ActiveWebEditorTab } from '../types';
 
 interface CodeEditorProps {
@@ -12,6 +12,8 @@ interface CodeEditorProps {
   language: 'javascript' | 'html' | 'css';
   onRun?: () => void;
   onClear: () => void;
+  onShare?: () => void;
+  shareState?: 'idle' | 'copied' | 'too_large';
   mode: PlaygroundMode;
   activeWebTab?: ActiveWebEditorTab;
   onSelectWebTab?: (tab: ActiveWebEditorTab) => void;
@@ -25,6 +27,8 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
   language,
   onRun,
   onClear,
+  onShare,
+  shareState = 'idle',
   mode,
   activeWebTab = 'html',
   onSelectWebTab,
@@ -205,6 +209,23 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
     }
   };
 
+  const playButtonColor = useMemo(() => {
+    switch (mode) {
+      case 'js':
+        return 'text-[#F7DF1E] hover:text-[#ffe833] hover:drop-shadow-[0_0_8px_rgba(247,223,30,0.6)]';
+      case 'ts':
+        return 'text-[#3178C6] hover:text-[#4b97fa] hover:drop-shadow-[0_0_8px_rgba(49,120,198,0.6)]';
+      case 'node':
+        return 'text-[#5FA04E] hover:text-[#74c460] hover:drop-shadow-[0_0_8px_rgba(95,160,78,0.6)]';
+      case 'next':
+        return 'text-white hover:text-cyan-300 hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.6)]';
+      case 'web':
+        return 'text-[#E44D26] hover:text-[#ff6138] hover:drop-shadow-[0_0_8px_rgba(228,77,38,0.6)]';
+      default:
+        return 'text-[#F7DF1E] hover:text-[#ffe833]';
+    }
+  }, [mode]);
+
   return (
     <div 
       className="flex flex-col h-full w-full bg-[#0b0d14] rounded-xl border border-[#1e2333] shadow-2xl overflow-hidden relative"
@@ -232,6 +253,14 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
           ) : mode === 'ts' ? (
             <span className="text-sm font-medium text-slate-100 tracking-tight">
               TypeScript
+            </span>
+          ) : mode === 'node' ? (
+            <span className="text-sm font-medium text-slate-100 tracking-tight">
+              Node.js
+            </span>
+          ) : mode === 'next' ? (
+            <span className="text-sm font-medium text-slate-100 tracking-tight">
+              Next.js
             </span>
           ) : (
             <div className="flex items-center gap-4">
@@ -271,15 +300,15 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
 
         {/* Right: Run, Copy, Download, Clear */}
         <div className="flex items-center gap-1.5">
-          {/* Run button */}
+          {/* Run button with primary playground brand color */}
           {onRun && (
             <button
               onClick={onRun}
               disabled={isRunning}
               className={`p-1.5 rounded-md transition-all cursor-pointer hover:bg-zinc-800/80 active:scale-95 mr-0.5 ${
                 isRunning
-                  ? 'text-amber-300 opacity-50 animate-pulse'
-                  : 'text-amber-300 hover:text-yellow-300 hover:drop-shadow-[0_0_8px_rgba(252,211,77,0.5)]'
+                  ? 'opacity-50 animate-pulse text-amber-300'
+                  : playButtonColor
               }`}
               title="Run code (Ctrl + Enter)"
             >
@@ -300,6 +329,35 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
           >
             {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
           </button>
+
+          {/* Share Button */}
+          {onShare && (
+            <button
+              onClick={onShare}
+              className={`p-1.5 rounded-md transition-colors cursor-pointer ${
+                shareState === 'copied'
+                  ? 'text-emerald-400 bg-emerald-500/10'
+                  : shareState === 'too_large'
+                  ? 'text-amber-400 bg-amber-500/10'
+                  : 'text-zinc-300 hover:text-white hover:bg-zinc-800'
+              }`}
+              title={
+                shareState === 'copied'
+                  ? 'Snippet link copied!'
+                  : shareState === 'too_large'
+                  ? 'Code is too large for URL sharing'
+                  : 'Share code snippet link'
+              }
+            >
+              {shareState === 'copied' ? (
+                <Check className="w-4 h-4 text-emerald-400" />
+              ) : shareState === 'too_large' ? (
+                <AlertCircle className="w-4 h-4 text-amber-400" />
+              ) : (
+                <Share2 className="w-4 h-4" />
+              )}
+            </button>
+          )}
 
           {/* Download Button */}
           <button

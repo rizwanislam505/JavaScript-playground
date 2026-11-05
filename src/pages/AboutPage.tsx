@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { SEOHead } from '../components/SEOHead';
 
 interface PageProps {
   onNavigate: (path: string) => void;
@@ -6,14 +7,6 @@ interface PageProps {
 
 export const AboutPage: React.FC<PageProps> = ({ onNavigate }) => {
   useEffect(() => {
-    document.title = 'About JS Playground – Free Online Code Editor';
-    let metaDesc = document.querySelector('meta[name="description"]');
-    if (!metaDesc) {
-      metaDesc = document.createElement('meta');
-      metaDesc.setAttribute('name', 'description');
-      document.head.appendChild(metaDesc);
-    }
-    metaDesc.setAttribute('content', 'Learn about JS Playground, a zero-latency, privacy-first online JavaScript and TypeScript editor running 100% in your browser.');
     window.scrollTo(0, 0);
   }, []);
 
@@ -22,48 +15,43 @@ export const AboutPage: React.FC<PageProps> = ({ onNavigate }) => {
     onNavigate(path);
   };
 
+  const aboutJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "AboutPage",
+    "name": "About JS Playground",
+    "url": "https://jsplayground.js.org/about",
+    "description": "JS Playground is a zero-latency, privacy-first online JavaScript and TypeScript editor running 100% in your browser."
+  };
+
   return (
     <div className="min-h-screen w-full bg-[#080a0f] text-zinc-300 font-sans selection:bg-yellow-500/30 selection:text-white overflow-y-auto">
+      <SEOHead
+        title="About JS Playground – Free Online Code Editor"
+        description="Learn about JS Playground, a zero-latency, privacy-first online JavaScript, TypeScript, Node.js, and Next.js editor running 100% in your browser."
+        keywords="About JS Playground, JavaScript playground features, TypeScript playground online, Node.js playground, Next.js sandbox, online code editor, browser JS runner"
+        canonicalPath="/about"
+        jsonLd={aboutJsonLd}
+      />
       <div className="max-w-4xl mx-auto px-4 py-8 sm:py-12">
-        {/* Navigation Bar */}
-        <nav className="mb-10 pb-4 border-b border-zinc-800/80 flex items-center justify-between text-xs sm:text-sm">
+        {/* Breadcrumb Navigation */}
+        <nav aria-label="Breadcrumb" className="mb-8 flex items-center gap-2 text-xs sm:text-sm text-zinc-400">
           <a
             href="/"
             onClick={(e) => handleLink(e, '/')}
-            className="text-zinc-400 hover:text-white font-medium transition-colors hover:underline"
+            className="hover:text-white transition-colors cursor-pointer"
           >
-            &larr; Back to Playground
+            Playground
           </a>
-          <div className="flex items-center gap-4 text-zinc-400">
-            <span className="text-white font-semibold">About</span>
-            <span className="text-zinc-700">|</span>
-            <a
-              href="/privacy-policy"
-              onClick={(e) => handleLink(e, '/privacy-policy')}
-              className="text-zinc-400 hover:text-white transition-colors hover:underline"
-            >
-              Privacy Policy
-            </a>
-            <span className="text-zinc-700">|</span>
-            <a
-              href="/terms-of-service"
-              onClick={(e) => handleLink(e, '/terms-of-service')}
-              className="text-zinc-400 hover:text-white transition-colors hover:underline"
-            >
-              Terms of Service
-            </a>
-          </div>
+          <span className="text-zinc-600">/</span>
+          <span className="text-zinc-200 font-semibold">About</span>
         </nav>
 
         {/* Content Body */}
         <main className="space-y-10 text-sm sm:text-base leading-relaxed text-zinc-300">
           <header className="space-y-3 border-b border-zinc-800/50 pb-6">
             <h1 className="text-2xl sm:text-4xl font-bold text-white tracking-tight">
-              About JS Playground &amp; TypeScript Playground
+              About JS Playground
             </h1>
-            <p className="text-xs sm:text-sm text-zinc-400 font-mono">
-              Domain: jsplayground.js.org &bull; Platform: Client-Side Web Standards (V8 / SpiderMonkey)
-            </p>
           </header>
 
           <section className="space-y-4">
@@ -71,7 +59,7 @@ export const AboutPage: React.FC<PageProps> = ({ onNavigate }) => {
               1. Platform Overview
             </h2>
             <p>
-              JS Playground (hosted live at <strong>jsplayground.js.org</strong>) is a free, high-performance web-based JavaScript and TypeScript editor, instant REPL, and web component prototyping sandbox. Engineered specifically for software engineers, frontend developers, learners, educators, and competitive programmers, it provides a zero-latency coding environment with total data privacy.
+              JS Playground (hosted live at <strong>jsplayground.js.org</strong>) is a free, high-performance web-based JavaScript editor, instant REPL, and web component prototyping sandbox. Engineered specifically for software engineers, frontend developers, learners, educators, and competitive programmers, it provides a zero-latency coding environment with total data privacy.
             </p>
             <p>
               Unlike conventional online sandboxes that require server-side spin-ups or cloud containers, JS Playground executes code natively inside your local browser tab. This delivers true zero-latency performance while guaranteeing that your source code is never sent to, processed by, or stored on external servers.
@@ -84,15 +72,15 @@ export const AboutPage: React.FC<PageProps> = ({ onNavigate }) => {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs sm:text-sm">
               <div className="p-4 rounded-xl bg-[#10141f] border border-zinc-800/80 space-y-2">
-                <h3 className="font-bold text-white text-base">JS Playground Mode</h3>
+                <h3 className="font-bold text-white text-base">Node.js Playground</h3>
                 <p className="text-zinc-400">
-                  Designed for testing pure JavaScript algorithms, data structures, utilities, regular expressions, and modern ECMAScript logic. Features a DevTools-grade interactive console with collapsible object inspection trees.
+                  Run Node.js runtime code in your browser. Perfect for testing Node.js standard APIs, file system utilities, and server-side logic in a lightweight, interactive REPL.
                 </p>
               </div>
               <div className="p-4 rounded-xl bg-[#10141f] border border-zinc-800/80 space-y-2">
-                <h3 className="font-bold text-white text-base">TypeScript Playground</h3>
+                <h3 className="font-bold text-white text-base">Next.js Playground</h3>
                 <p className="text-zinc-400">
-                  Run TypeScript online instantly. Test interfaces, type annotations, generics, enums, and modern TS syntax directly in your browser with zero build setup or server compilation delays.
+                  Experience Next.js component development instantly. Prototype React components, server actions, and App Router layouts within a high-performance, sandboxed environment.
                 </p>
               </div>
               <div className="p-4 rounded-xl bg-[#10141f] border border-zinc-800/80 space-y-2">
@@ -142,21 +130,44 @@ export const AboutPage: React.FC<PageProps> = ({ onNavigate }) => {
                 href="https://github.com/rizwanislam505/JavaScript-playground"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:underline"
+                className="hover:underline text-yellow-400"
               >
-                https://github.com/rizwanislam505/JavaScript-playground
+                github.com/rizwanislam505/JavaScript-playground
               </a>
             </p>
           </section>
 
           {/* Footer Navigation */}
-          <footer className="pt-8 border-t border-zinc-800 text-xs text-zinc-500 flex flex-wrap items-center justify-between gap-4">
-            <span>&copy; 2026 JS Playground (jsplayground.js.org). All rights reserved.</span>
-            <div className="flex gap-4">
-              <a href="/" onClick={(e) => handleLink(e, '/')} className="text-zinc-400 hover:text-zinc-200 hover:underline">Playground</a>
-              <a href="/typescript-playground" onClick={(e) => handleLink(e, '/typescript-playground')} className="text-zinc-400 hover:text-zinc-200 hover:underline">TypeScript Playground</a>
-              <a href="/privacy-policy" onClick={(e) => handleLink(e, '/privacy-policy')} className="text-zinc-400 hover:text-zinc-200 hover:underline">Privacy Policy</a>
-              <a href="/terms-of-service" onClick={(e) => handleLink(e, '/terms-of-service')} className="text-zinc-400 hover:text-zinc-200 hover:underline">Terms of Service</a>
+          <footer className="mt-16 pt-8 border-t border-zinc-800/80 text-xs text-zinc-400 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-2.5">
+              <div className="w-5 h-5 rounded-[4px] bg-[#F7DF1E] flex items-center justify-center font-bold text-black text-[10px]">
+                JS
+              </div>
+              <span className="font-bold text-white text-xs">JS Playground</span>
+              <span className="text-zinc-600">&bull;</span>
+              <span className="text-zinc-500">&copy; 2026 jsplayground.js.org. All rights reserved.</span>
+            </div>
+            <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-zinc-400 text-xs">
+              <a href="/" onClick={(e) => handleLink(e, '/')} className="hover:text-white transition-colors">
+                Playground
+              </a>
+              <a href="/about" onClick={(e) => handleLink(e, '/about')} className="hover:text-white transition-colors">
+                About
+              </a>
+              <a href="/privacy-policy" onClick={(e) => handleLink(e, '/privacy-policy')} className="hover:text-white transition-colors">
+                Privacy Policy
+              </a>
+              <a href="/terms-of-service" onClick={(e) => handleLink(e, '/terms-of-service')} className="hover:text-white transition-colors">
+                Terms of Service
+              </a>
+              <a
+                href="https://github.com/rizwanislam505/JavaScript-playground"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-white transition-colors"
+              >
+                GitHub
+              </a>
             </div>
           </footer>
         </main>

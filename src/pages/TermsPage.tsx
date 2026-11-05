@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { SEOHead } from '../components/SEOHead';
 
 interface PageProps {
   onNavigate: (path: string) => void;
@@ -6,14 +7,6 @@ interface PageProps {
 
 export const TermsPage: React.FC<PageProps> = ({ onNavigate }) => {
   useEffect(() => {
-    document.title = 'Terms of Service – JS Playground';
-    let metaDesc = document.querySelector('meta[name="description"]');
-    if (!metaDesc) {
-      metaDesc = document.createElement('meta');
-      metaDesc.setAttribute('name', 'description');
-      document.head.appendChild(metaDesc);
-    }
-    metaDesc.setAttribute('content', 'JS Playground Terms of Service. Review user code ownership, platform disclaimers, and acceptable use guidelines.');
     window.scrollTo(0, 0);
   }, []);
 
@@ -22,37 +15,35 @@ export const TermsPage: React.FC<PageProps> = ({ onNavigate }) => {
     onNavigate(path);
   };
 
+  const termsJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Terms of Service – JS Playground",
+    "url": "https://jsplayground.js.org/terms-of-service",
+    "description": "JS Playground Terms of Service. Review user code ownership, platform disclaimers, and acceptable use guidelines."
+  };
+
   return (
     <div className="min-h-screen w-full bg-[#080a0f] text-zinc-300 font-sans selection:bg-yellow-500/30 selection:text-white overflow-y-auto">
+      <SEOHead
+        title="Terms of Service – JS Playground"
+        description="JS Playground Terms of Service. Review user code ownership, platform disclaimers, and acceptable use guidelines."
+        keywords="JS Playground terms of service, JavaScript playground terms, code ownership terms, open source playground legal guidelines"
+        canonicalPath="/terms-of-service"
+        jsonLd={termsJsonLd}
+      />
       <div className="max-w-4xl mx-auto px-4 py-8 sm:py-12">
-        {/* Navigation Bar */}
-        <nav className="mb-10 pb-4 border-b border-zinc-800/80 flex items-center justify-between text-xs sm:text-sm">
+        {/* Breadcrumb Navigation */}
+        <nav aria-label="Breadcrumb" className="mb-8 flex items-center gap-2 text-xs sm:text-sm text-zinc-400">
           <a
             href="/"
             onClick={(e) => handleLink(e, '/')}
-            className="text-zinc-400 hover:text-white font-medium transition-colors hover:underline"
+            className="hover:text-white transition-colors cursor-pointer"
           >
-            &larr; Back to Playground
+            Playground
           </a>
-          <div className="flex items-center gap-4 text-zinc-400">
-            <a
-              href="/about"
-              onClick={(e) => handleLink(e, '/about')}
-              className="text-zinc-400 hover:text-white transition-colors hover:underline"
-            >
-              About
-            </a>
-            <span className="text-zinc-700">|</span>
-            <a
-              href="/privacy-policy"
-              onClick={(e) => handleLink(e, '/privacy-policy')}
-              className="text-zinc-400 hover:text-white transition-colors hover:underline"
-            >
-              Privacy Policy
-            </a>
-            <span className="text-zinc-700">|</span>
-            <span className="text-white font-semibold">Terms of Service</span>
-          </div>
+          <span className="text-zinc-600">/</span>
+          <span className="text-zinc-200 font-semibold">Terms of Service</span>
         </nav>
 
         {/* Content Body */}
@@ -62,7 +53,7 @@ export const TermsPage: React.FC<PageProps> = ({ onNavigate }) => {
               Terms of Service
             </h1>
             <p className="text-xs sm:text-sm text-zinc-400 font-mono">
-              Last Revised: November 2026 &bull; Domain: jsplayground.js.org
+              Last Updated: November 2026
             </p>
           </header>
 
@@ -71,7 +62,7 @@ export const TermsPage: React.FC<PageProps> = ({ onNavigate }) => {
               1. Acceptance of Terms
             </h2>
             <p>
-              By accessing or using JS Playground (hosted at <strong>jsplayground.js.org</strong>) or TypeScript Playground, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the application.
+              By accessing or using JS Playground (hosted at <strong>jsplayground.js.org</strong>), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the application.
             </p>
           </section>
 
@@ -116,27 +107,63 @@ export const TermsPage: React.FC<PageProps> = ({ onNavigate }) => {
               6. Repository &amp; Contact
             </h2>
             <p>
-              For developer issues, pull requests, or questions regarding these terms, visit the repository on GitHub:
+              For developer issues, pull requests, legal inquiries, or questions regarding these terms, visit our official GitHub repository or contact us directly via email:
             </p>
-            <p className="font-mono text-xs sm:text-sm text-yellow-400">
+            <div className="space-y-2 font-mono text-xs sm:text-sm">
+              <p className="text-yellow-400">
+                <span className="text-zinc-400">GitHub: </span>
+                <a
+                  href="https://github.com/rizwanislam505/JavaScript-playground"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:underline text-yellow-400"
+                >
+                  github.com/rizwanislam505/JavaScript-playground
+                </a>
+              </p>
+              <p className="text-yellow-400">
+                <span className="text-zinc-400">Email: </span>
+                <a
+                  href="mailto:rizwanislam505@gmail.com"
+                  className="hover:underline text-yellow-400"
+                >
+                  rizwanislam505@gmail.com
+                </a>
+              </p>
+            </div>
+          </section>
+
+          {/* Footer Navigation */}
+          <footer className="mt-16 pt-8 border-t border-zinc-800/80 text-xs text-zinc-400 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-2.5">
+              <div className="w-5 h-5 rounded-[4px] bg-[#F7DF1E] flex items-center justify-center font-bold text-black text-[10px]">
+                JS
+              </div>
+              <span className="font-bold text-white text-xs">JS Playground</span>
+              <span className="text-zinc-600">&bull;</span>
+              <span className="text-zinc-500">&copy; 2026 jsplayground.js.org. All rights reserved.</span>
+            </div>
+            <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-zinc-400 text-xs">
+              <a href="/" onClick={(e) => handleLink(e, '/')} className="hover:text-white transition-colors">
+                Playground
+              </a>
+              <a href="/about" onClick={(e) => handleLink(e, '/about')} className="hover:text-white transition-colors">
+                About
+              </a>
+              <a href="/privacy-policy" onClick={(e) => handleLink(e, '/privacy-policy')} className="hover:text-white transition-colors">
+                Privacy Policy
+              </a>
+              <a href="/terms-of-service" onClick={(e) => handleLink(e, '/terms-of-service')} className="hover:text-white transition-colors">
+                Terms of Service
+              </a>
               <a
                 href="https://github.com/rizwanislam505/JavaScript-playground"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:underline"
+                className="hover:text-white transition-colors"
               >
-                https://github.com/rizwanislam505/JavaScript-playground
+                GitHub
               </a>
-            </p>
-          </section>
-
-          {/* Footer Navigation */}
-          <footer className="pt-8 border-t border-zinc-800 text-xs text-zinc-500 flex flex-wrap items-center justify-between gap-4">
-            <span>&copy; 2026 JS Playground (jsplayground.js.org). All rights reserved.</span>
-            <div className="flex gap-4">
-              <a href="/" onClick={(e) => handleLink(e, '/')} className="text-zinc-400 hover:text-zinc-200 hover:underline">Playground</a>
-              <a href="/about" onClick={(e) => handleLink(e, '/about')} className="text-zinc-400 hover:text-zinc-200 hover:underline">About</a>
-              <a href="/privacy-policy" onClick={(e) => handleLink(e, '/privacy-policy')} className="text-zinc-400 hover:text-zinc-200 hover:underline">Privacy Policy</a>
             </div>
           </footer>
         </main>

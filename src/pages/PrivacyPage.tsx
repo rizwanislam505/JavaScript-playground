@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { SEOHead } from '../components/SEOHead';
 
 interface PageProps {
   onNavigate: (path: string) => void;
@@ -6,14 +7,6 @@ interface PageProps {
 
 export const PrivacyPage: React.FC<PageProps> = ({ onNavigate }) => {
   useEffect(() => {
-    document.title = 'Privacy Policy – JS Playground';
-    let metaDesc = document.querySelector('meta[name="description"]');
-    if (!metaDesc) {
-      metaDesc = document.createElement('meta');
-      metaDesc.setAttribute('name', 'description');
-      document.head.appendChild(metaDesc);
-    }
-    metaDesc.setAttribute('content', 'JS Playground Privacy Policy. Learn about our 100% client-side execution, zero code tracking, and local storage safety.');
     window.scrollTo(0, 0);
   }, []);
 
@@ -22,37 +15,35 @@ export const PrivacyPage: React.FC<PageProps> = ({ onNavigate }) => {
     onNavigate(path);
   };
 
+  const privacyJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Privacy Policy – JS Playground",
+    "url": "https://jsplayground.js.org/privacy-policy",
+    "description": "JS Playground Privacy Policy. Learn about our 100% client-side execution, zero code tracking, and local storage safety."
+  };
+
   return (
     <div className="min-h-screen w-full bg-[#080a0f] text-zinc-300 font-sans selection:bg-yellow-500/30 selection:text-white overflow-y-auto">
+      <SEOHead
+        title="Privacy Policy – JS Playground"
+        description="JS Playground Privacy Policy. Learn about our 100% client-side execution, zero code tracking, and local storage safety."
+        keywords="JS Playground privacy policy, JavaScript playground privacy, zero tracking code editor, private client-side JS runner, local browser sandbox privacy"
+        canonicalPath="/privacy-policy"
+        jsonLd={privacyJsonLd}
+      />
       <div className="max-w-4xl mx-auto px-4 py-8 sm:py-12">
-        {/* Navigation Bar */}
-        <nav className="mb-10 pb-4 border-b border-zinc-800/80 flex items-center justify-between text-xs sm:text-sm">
+        {/* Breadcrumb Navigation */}
+        <nav aria-label="Breadcrumb" className="mb-8 flex items-center gap-2 text-xs sm:text-sm text-zinc-400">
           <a
             href="/"
             onClick={(e) => handleLink(e, '/')}
-            className="text-zinc-400 hover:text-white font-medium transition-colors hover:underline"
+            className="hover:text-white transition-colors cursor-pointer"
           >
-            &larr; Back to Playground
+            Playground
           </a>
-          <div className="flex items-center gap-4 text-zinc-400">
-            <a
-              href="/about"
-              onClick={(e) => handleLink(e, '/about')}
-              className="text-zinc-400 hover:text-white transition-colors hover:underline"
-            >
-              About
-            </a>
-            <span className="text-zinc-700">|</span>
-            <span className="text-white font-semibold">Privacy Policy</span>
-            <span className="text-zinc-700">|</span>
-            <a
-              href="/terms-of-service"
-              onClick={(e) => handleLink(e, '/terms-of-service')}
-              className="text-zinc-400 hover:text-white transition-colors hover:underline"
-            >
-              Terms of Service
-            </a>
-          </div>
+          <span className="text-zinc-600">/</span>
+          <span className="text-zinc-200 font-semibold">Privacy Policy</span>
         </nav>
 
         {/* Content Body */}
@@ -62,7 +53,7 @@ export const PrivacyPage: React.FC<PageProps> = ({ onNavigate }) => {
               Privacy Policy
             </h1>
             <p className="text-xs sm:text-sm text-zinc-400 font-mono">
-              Last Revised: November 2026 &bull; Domain: jsplayground.js.org
+              Last Updated: November 2026
             </p>
           </header>
 
@@ -74,7 +65,7 @@ export const PrivacyPage: React.FC<PageProps> = ({ onNavigate }) => {
               JS Playground (<strong>jsplayground.js.org</strong>) is engineered around a core principle: <strong>100% client-side privacy</strong>. We believe developers should be able to experiment with code, algorithms, and web components without worrying about remote code telemetry, server monitoring, or hidden data collection.
             </p>
             <p>
-              This Privacy Policy explains how information is handled when you use JS Playground or TypeScript Playground.
+              This Privacy Policy explains how information is handled when you use JS Playground.
             </p>
           </section>
 
@@ -83,7 +74,7 @@ export const PrivacyPage: React.FC<PageProps> = ({ onNavigate }) => {
               2. Zero Server-Side Code Collection
             </h2>
             <p>
-              When you write, edit, compile, or execute code in JS Playground or TypeScript Playground, <strong>no code is ever sent to our servers or any third-party backend</strong>. All parsing, evaluation, formatting, and execution occur strictly within your computer's local web browser memory using native ECMAScript engines (Google V8, Mozilla SpiderMonkey, or Apple JavaScriptCore).
+              When you write, edit, compile, or execute code in JS Playground, <strong>no code is ever sent to our servers or any third-party backend</strong>. All parsing, evaluation, formatting, and execution occur strictly within your computer's local web browser memory using native ECMAScript engines (Google V8, Mozilla SpiderMonkey, or Apple JavaScriptCore).
             </p>
           </section>
 
@@ -119,27 +110,63 @@ export const PrivacyPage: React.FC<PageProps> = ({ onNavigate }) => {
               6. Contact Information
             </h2>
             <p>
-              If you have any questions or concerns regarding this Privacy Policy, please open an issue on the official GitHub repository at:
+              If you have any questions or concerns regarding this Privacy Policy, please open an issue on the official GitHub repository or contact us via email:
             </p>
-            <p className="font-mono text-xs sm:text-sm text-yellow-400">
+            <div className="space-y-2 font-mono text-xs sm:text-sm">
+              <p className="text-yellow-400">
+                <span className="text-zinc-400">GitHub: </span>
+                <a
+                  href="https://github.com/rizwanislam505/JavaScript-playground"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:underline text-yellow-400"
+                >
+                  github.com/rizwanislam505/JavaScript-playground
+                </a>
+              </p>
+              <p className="text-yellow-400">
+                <span className="text-zinc-400">Email: </span>
+                <a
+                  href="mailto:rizwanislam505@gmail.com"
+                  className="hover:underline text-yellow-400"
+                >
+                  rizwanislam505@gmail.com
+                </a>
+              </p>
+            </div>
+          </section>
+
+          {/* Footer Navigation */}
+          <footer className="mt-16 pt-8 border-t border-zinc-800/80 text-xs text-zinc-400 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-2.5">
+              <div className="w-5 h-5 rounded-[4px] bg-[#F7DF1E] flex items-center justify-center font-bold text-black text-[10px]">
+                JS
+              </div>
+              <span className="font-bold text-white text-xs">JS Playground</span>
+              <span className="text-zinc-600">&bull;</span>
+              <span className="text-zinc-500">&copy; 2026 jsplayground.js.org. All rights reserved.</span>
+            </div>
+            <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-zinc-400 text-xs">
+              <a href="/" onClick={(e) => handleLink(e, '/')} className="hover:text-white transition-colors">
+                Playground
+              </a>
+              <a href="/about" onClick={(e) => handleLink(e, '/about')} className="hover:text-white transition-colors">
+                About
+              </a>
+              <a href="/privacy-policy" onClick={(e) => handleLink(e, '/privacy-policy')} className="hover:text-white transition-colors">
+                Privacy Policy
+              </a>
+              <a href="/terms-of-service" onClick={(e) => handleLink(e, '/terms-of-service')} className="hover:text-white transition-colors">
+                Terms of Service
+              </a>
               <a
                 href="https://github.com/rizwanislam505/JavaScript-playground"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:underline"
+                className="hover:text-white transition-colors"
               >
-                https://github.com/rizwanislam505/JavaScript-playground
+                GitHub
               </a>
-            </p>
-          </section>
-
-          {/* Footer Navigation */}
-          <footer className="pt-8 border-t border-zinc-800 text-xs text-zinc-500 flex flex-wrap items-center justify-between gap-4">
-            <span>&copy; 2026 JS Playground (jsplayground.js.org). All rights reserved.</span>
-            <div className="flex gap-4">
-              <a href="/" onClick={(e) => handleLink(e, '/')} className="text-zinc-400 hover:text-zinc-200 hover:underline">Playground</a>
-              <a href="/about" onClick={(e) => handleLink(e, '/about')} className="text-zinc-400 hover:text-zinc-200 hover:underline">About</a>
-              <a href="/terms-of-service" onClick={(e) => handleLink(e, '/terms-of-service')} className="text-zinc-400 hover:text-zinc-200 hover:underline">Terms of Service</a>
             </div>
           </footer>
         </main>

@@ -6,30 +6,49 @@ import {
   ConsoleLogEntry, 
   WebProjectState 
 } from './types';
-import { JS_DEFAULT_CODE, TS_DEFAULT_CODE, WEB_DEFAULT_PROJECT } from './templates';
+import { 
+  JS_DEFAULT_CODE, 
+  TS_DEFAULT_CODE, 
+  NODE_DEFAULT_CODE, 
+  NEXT_DEFAULT_CODE, 
+  WEB_DEFAULT_PROJECT 
+} from './templates';
 import { Header } from './components/Header';
+import { NavigationDrawer } from './components/NavigationDrawer';
 import { SponsorBanner } from './components/SponsorBanner';
 import { CodeEditor } from './components/CodeEditor';
 import { ConsoleView } from './components/ConsoleView';
 import { WebPreview } from './components/WebPreview';
 import { executeJavaScript } from './utils/codeRunner';
 import { safeStorageGet, safeStorageSet } from './utils/storage';
+import { generateShareUrl, decodeCodeFromHash } from './utils/shareUrl';
 import { AboutPage } from './pages/AboutPage';
 import { PrivacyPage } from './pages/PrivacyPage';
 import { TermsPage } from './pages/TermsPage';
+import { SEOHead } from './components/SEOHead';
 
 export default function App() {
-  // Playground mode: 'js' | 'ts' | 'web'
+  // Navigation Drawer state
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  // Playground mode: 'js' | 'ts' | 'node' | 'next' | 'web'
   const [mode, setMode] = useState<PlaygroundMode>('js');
 
-  // Raw code state for JavaScript
+  // Code state per environment
   const [jsCode, setJsCode] = useState<string>(() => {
     return safeStorageGet('js_playground_raw_code') ?? JS_DEFAULT_CODE;
   });
 
-  // Raw code state for TypeScript
   const [tsCode, setTsCode] = useState<string>(() => {
     return safeStorageGet('ts_playground_raw_code') ?? TS_DEFAULT_CODE;
+  });
+
+  const [nodeCode, setNodeCode] = useState<string>(() => {
+    return safeStorageGet('node_playground_raw_code') ?? NODE_DEFAULT_CODE;
+  });
+
+  const [nextCode, setNextCode] = useState<string>(() => {
+    return safeStorageGet('next_playground_raw_code') ?? NEXT_DEFAULT_CODE;
   });
 
   const [webProject, setWebProject] = useState<WebProjectState>(() => {
@@ -49,6 +68,8 @@ export default function App() {
   // Console log state
   const [jsLogs, setJsLogs] = useState<ConsoleLogEntry[]>([]);
   const [tsLogs, setTsLogs] = useState<ConsoleLogEntry[]>([]);
+  const [nodeLogs, setNodeLogs] = useState<ConsoleLogEntry[]>([]);
+  const [nextLogs, setNextLogs] = useState<ConsoleLogEntry[]>([]);
   const [webLogs, setWebLogs] = useState<ConsoleLogEntry[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const [webRunTrigger, setWebRunTrigger] = useState(0);
@@ -58,16 +79,69 @@ export default function App() {
   const isDraggingRef = useRef(false);
   const splitContainerRef = useRef<HTMLDivElement>(null);
 
-  // Theme state
+  // Theme & Share state
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const [shareState, setShareState] = useState<'idle' | 'copied' | 'too_large'>('idle');
 
-  // URL Routing: / , /typescript-playground , /about , /privacy-policy , /terms-of-service
+  // Decompress shared snippet from URL hash on load
+  useEffect(() => {
+    try {
+      if (typeof window !== 'undefined' && window.location.hash) {
+        const decompressed = decodeCodeFromHash(window.location.hash);
+        if (decompressed) {
+          const path = window.location.pathname.toLowerCase();
+          if (path.includes('typescript')) {
+            setTsCode(decompressed);
+          } else if (path.includes('nodejs')) {
+            setNodeCode(decompressed);
+          } else if (path.includes('nextjs')) {
+            setNextCode(decompressed);
+          } else {
+            setJsCode(decompressed);
+          }
+        }
+      }
+    } catch (e) {}
+  }, []);
+
+  // Handle Share Code Action with URL length safety check
+  const handleShareCode = useCallback(() => {
+    try {
+      const activeCode = mode === 'js'
+        ? jsCode
+        : mode === 'ts'
+        ? tsCode
+        : mode === 'node'
+        ? nodeCode
+        : mode === 'next'
+        ? nextCode
+        : JSON.stringify(webProject);
+
+      const result = generateShareUrl(activeCode, mode);
+
+      if (result.isTooLarge) {
+        setShareState('too_large');
+        setTimeout(() => setShareState('idle'), 3000);
+        return;
+      }
+
+      if (result.success && result.url) {
+        navigator.clipboard.writeText(result.url);
+        setShareState('copied');
+        setTimeout(() => setShareState('idle'), 2000);
+      }
+    } catch (e) {}
+  }, [mode, jsCode, tsCode, nodeCode, nextCode, webProject]);
+
+  // URL Routing: / , /typescript-playground , /nodejs-playground , /nextjs-playground , /about , /privacy-policy , /terms-of-service
   const [currentRoute, setCurrentRoute] = useState<string>(() => {
     try {
       if (typeof window !== 'undefined' && window.location) {
         const path = (window.location.pathname || '').toLowerCase();
         const hash = (window.location.hash || '').toLowerCase();
         if (path.includes('typescript') || hash.includes('typescript')) return '/typescript-playground';
+        if (path.includes('nodejs') || hash.includes('nodejs')) return '/nodejs-playground';
+        if (path.includes('nextjs') || hash.includes('nextjs')) return '/nextjs-playground';
         if (path.includes('about') || hash.includes('about')) return '/about';
         if (path.includes('privacy') || hash.includes('privacy')) return '/privacy-policy';
         if (path.includes('terms') || hash.includes('terms')) return '/terms-of-service';
@@ -86,6 +160,12 @@ export default function App() {
         if (path.includes('typescript') || hash.includes('typescript')) {
           setCurrentRoute('/typescript-playground');
           setMode('ts');
+        } else if (path.includes('nodejs') || hash.includes('nodejs')) {
+          setCurrentRoute('/nodejs-playground');
+          setMode('node');
+        } else if (path.includes('nextjs') || hash.includes('nextjs')) {
+          setCurrentRoute('/nextjs-playground');
+          setMode('next');
         } else if (path.includes('about') || hash.includes('about')) {
           setCurrentRoute('/about');
         } else if (path.includes('privacy') || hash.includes('privacy')) {
@@ -110,35 +190,6 @@ export default function App() {
     } catch (e) {}
   }, []);
 
-  // Sync document.title and meta description based on route & mode
-  useEffect(() => {
-    try {
-      let metaDesc = document.querySelector('meta[name="description"]');
-      if (!metaDesc) {
-        metaDesc = document.createElement('meta');
-        metaDesc.setAttribute('name', 'description');
-        document.head.appendChild(metaDesc);
-      }
-
-      if (currentRoute === '/typescript-playground' || mode === 'ts') {
-        document.title = 'TypeScript Playground – Online TypeScript Compiler';
-        metaDesc.setAttribute('content', 'Run TypeScript online in your browser. Free online TypeScript compiler with real-time DevTools console, top-level await, and file drag-and-drop.');
-      } else if (currentRoute === '/about') {
-        document.title = 'About JS Playground – Free Online Code Editor';
-        metaDesc.setAttribute('content', 'Learn about JS Playground, a zero-latency, privacy-first online JavaScript and TypeScript editor running 100% in your browser.');
-      } else if (currentRoute === '/privacy-policy') {
-        document.title = 'Privacy Policy – JS Playground';
-        metaDesc.setAttribute('content', 'JS Playground Privacy Policy. Learn about our 100% client-side execution, zero code tracking, and local storage safety.');
-      } else if (currentRoute === '/terms-of-service') {
-        document.title = 'Terms of Service – JS Playground';
-        metaDesc.setAttribute('content', 'JS Playground Terms of Service. Review user code ownership, platform disclaimers, and acceptable use guidelines.');
-      } else {
-        document.title = 'JS Playground – Online JavaScript & TypeScript Editor';
-        metaDesc.setAttribute('content', 'Free online JavaScript & TypeScript playground. Run code instantly in your browser with a DevTools console, top-level await, and zero setup.');
-      }
-    } catch (e) {}
-  }, [currentRoute, mode]);
-
   const navigate = (path: string) => {
     try {
       if (typeof window !== 'undefined' && window.history) {
@@ -148,6 +199,12 @@ export default function App() {
     setCurrentRoute(path);
     if (path.includes('typescript')) {
       setMode('ts');
+    } else if (path.includes('nodejs')) {
+      setMode('node');
+    } else if (path.includes('nextjs')) {
+      setMode('next');
+    } else if (path === '/') {
+      setMode('js');
     }
   };
 
@@ -158,6 +215,12 @@ export default function App() {
         if (newMode === 'ts') {
           window.history.pushState({}, '', '/typescript-playground');
           setCurrentRoute('/typescript-playground');
+        } else if (newMode === 'node') {
+          window.history.pushState({}, '', '/nodejs-playground');
+          setCurrentRoute('/nodejs-playground');
+        } else if (newMode === 'next') {
+          window.history.pushState({}, '', '/nextjs-playground');
+          setCurrentRoute('/nextjs-playground');
         } else if (newMode === 'js') {
           window.history.pushState({}, '', '/');
           setCurrentRoute('/');
@@ -186,6 +249,20 @@ export default function App() {
     }, 400);
     return () => clearTimeout(handler);
   }, [tsCode]);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      safeStorageSet('node_playground_raw_code', nodeCode);
+    }, 400);
+    return () => clearTimeout(handler);
+  }, [nodeCode]);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      safeStorageSet('next_playground_raw_code', nextCode);
+    }, 400);
+    return () => clearTimeout(handler);
+  }, [nextCode]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -246,6 +323,58 @@ export default function App() {
     }
   }, [tsCode]);
 
+  // Run Node.js
+  const handleRunNode = useCallback(async () => {
+    if (!nodeCode.trim()) return;
+    setIsRunning(true);
+    setNodeLogs([]);
+    try {
+      await executeJavaScript(
+        nodeCode, 
+        (entry) => setNodeLogs((prev) => [...prev, entry]),
+        () => setNodeLogs([])
+      );
+    } catch (err: any) {
+      setNodeLogs((prev) => [
+        ...prev,
+        {
+          id: Math.random().toString(),
+          type: 'error',
+          items: [err.message || 'Execution error'],
+          timestamp: new Date().toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })
+        }
+      ]);
+    } finally {
+      setIsRunning(false);
+    }
+  }, [nodeCode]);
+
+  // Run Next.js
+  const handleRunNext = useCallback(async () => {
+    if (!nextCode.trim()) return;
+    setIsRunning(true);
+    setNextLogs([]);
+    try {
+      await executeJavaScript(
+        nextCode, 
+        (entry) => setNextLogs((prev) => [...prev, entry]),
+        () => setNextLogs([])
+      );
+    } catch (err: any) {
+      setNextLogs((prev) => [
+        ...prev,
+        {
+          id: Math.random().toString(),
+          type: 'error',
+          items: [err.message || 'Execution error'],
+          timestamp: new Date().toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })
+        }
+      ]);
+    } finally {
+      setIsRunning(false);
+    }
+  }, [nextCode]);
+
   // Run Web
   const handleRunWeb = useCallback(() => {
     setWebLogs([]);
@@ -258,10 +387,14 @@ export default function App() {
       handleRunJs();
     } else if (mode === 'ts') {
       handleRunTs();
+    } else if (mode === 'node') {
+      handleRunNode();
+    } else if (mode === 'next') {
+      handleRunNext();
     } else {
       handleRunWeb();
     }
-  }, [mode, handleRunJs, handleRunTs, handleRunWeb]);
+  }, [mode, handleRunJs, handleRunTs, handleRunNode, handleRunNext, handleRunWeb]);
 
   // Clear Left Editor Card
   const handleClearEditor = () => {
@@ -269,6 +402,10 @@ export default function App() {
       setJsCode('');
     } else if (mode === 'ts') {
       setTsCode('');
+    } else if (mode === 'node') {
+      setNodeCode('');
+    } else if (mode === 'next') {
+      setNextCode('');
     } else {
       setWebProject(prev => ({
         ...prev,
@@ -283,6 +420,10 @@ export default function App() {
       setJsLogs([]);
     } else if (mode === 'ts') {
       setTsLogs([]);
+    } else if (mode === 'node') {
+      setNodeLogs([]);
+    } else if (mode === 'next') {
+      setNextLogs([]);
     } else {
       setWebLogs([]);
     }
@@ -313,6 +454,20 @@ export default function App() {
         trimmed,
         (entry) => setTsLogs(prev => [...prev, entry]),
         () => setTsLogs([])
+      );
+    } else if (mode === 'node') {
+      setNodeLogs(prev => [...prev, userPromptEntry]);
+      await executeJavaScript(
+        trimmed,
+        (entry) => setNodeLogs(prev => [...prev, entry]),
+        () => setNodeLogs([])
+      );
+    } else if (mode === 'next') {
+      setNextLogs(prev => [...prev, userPromptEntry]);
+      await executeJavaScript(
+        trimmed,
+        (entry) => setNextLogs(prev => [...prev, entry]),
+        () => setNextLogs([])
       );
     } else {
       setWebLogs(prev => [...prev, userPromptEntry]);
@@ -427,23 +582,91 @@ export default function App() {
     return <TermsPage onNavigate={navigate} />;
   }
 
+  const isTsRoute = currentRoute === '/typescript-playground' || mode === 'ts';
+  const isNodeRoute = currentRoute === '/nodejs-playground' || mode === 'node';
+  const isNextRoute = currentRoute === '/nextjs-playground' || mode === 'next';
+
+  const currentTitle = isTsRoute
+    ? 'TypeScript Playground – Online TypeScript Compiler'
+    : isNodeRoute
+    ? 'Node.js Playground – Online Node.js REPL & Runtime'
+    : isNextRoute
+    ? 'Next.js Playground – Online React & Next.js Sandbox'
+    : 'JS Playground – Online JavaScript & TypeScript Editor';
+
+  const currentDesc = isTsRoute
+    ? 'Run TypeScript online in your browser. Free online TypeScript compiler with real-time DevTools console, top-level await, and file drag-and-drop.'
+    : isNodeRoute
+    ? 'Run Node.js online instantly. Zero-setup Node.js REPL with interactive DevTools console, object inspectors, and top-level await.'
+    : isNextRoute
+    ? 'Run Next.js and React components online. High-performance browser sandbox for React and Next.js.'
+    : 'Free online JavaScript & TypeScript playground. Run code instantly in your browser with a DevTools console, top-level await, and zero setup.';
+
+  const currentCanonical = isTsRoute
+    ? '/typescript-playground'
+    : isNodeRoute
+    ? '/nodejs-playground'
+    : isNextRoute
+    ? '/nextjs-playground'
+    : '';
+
+  const currentKeywords = isTsRoute
+    ? 'TypeScript playground, online TypeScript compiler, run TypeScript online, TS playground online, test TypeScript online, TypeScript sandbox, browser TypeScript runner, jsplayground.js.org'
+    : isNodeRoute
+    ? 'Node.js playground, run Node.js online, online Node.js compiler, Node.js REPL online, test Node code online, Node.js editor online, nodejs playground online, jsplayground.js.org'
+    : isNextRoute
+    ? 'Next.js playground, run Next.js online, online Next.js editor, Next.js sandbox, React playground, test React components online, nextjs playground online, jsplayground.js.org'
+    : 'JavaScript playground, JS playground, online JavaScript editor, run JavaScript online, JavaScript compiler online, js playground online, javascript playground online, online javascript compiler, run js online, javascript editor online, run js code online, online javascript runner, test javascript online, javascript sandbox online, js repl, html css js sandbox, jsfiddle alternative, in-browser javascript compiler, free javascript compiler, devtools console, TypeScript playground, Node.js playground, Next.js playground, jsplayground.js.org';
+
+  const jsonLdData = [
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "JS Playground",
+      "url": "https://jsplayground.js.org/",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "All modern web browsers",
+      "description": currentDesc,
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+    }
+  ];
+
   return (
     <div 
       className={`h-screen w-screen flex flex-col overflow-hidden font-sans select-none ${
         theme === 'dark' ? 'bg-[#080a0f] text-slate-100' : 'bg-slate-100 text-slate-900'
       }`}
     >
-      {/* Top Header Bar */}
+      <SEOHead
+        title={currentTitle}
+        description={currentDesc}
+        keywords={currentKeywords}
+        canonicalPath={currentCanonical}
+        jsonLd={jsonLdData}
+      />
+
+      {/* Sliding Navigation Drawer */}
+      <NavigationDrawer
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        activeMode={mode}
+        currentRoute={currentRoute}
+        onNavigate={navigate}
+        onModeChange={handleModeChange}
+      />
+
+      {/* Top Header Bar with dynamic mode logo */}
       <Header
         mode={mode}
         onModeChange={handleModeChange}
+        onToggleDrawer={() => setIsDrawerOpen(true)}
         isFullscreen={false}
         onToggleFullscreen={() => {}}
         theme={theme}
         onToggleTheme={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
       />
 
-      {/* Main Playground Workspace: Vertical split on mobile; Resizable horizontal split on desktop */}
+      {/* Main Playground Workspace */}
       <main 
         ref={splitContainerRef}
         className="flex-1 w-full p-2 sm:p-3 md:p-4 flex flex-col md:flex-row gap-1 sm:gap-2 md:gap-3 overflow-hidden relative select-none"
@@ -464,6 +687,8 @@ export default function App() {
               language="javascript"
               onRun={handleRun}
               onClear={handleClearEditor}
+              onShare={handleShareCode}
+              shareState={shareState}
               mode="js"
               placeholder="Paste your JavaScript or drop a file"
               isRunning={isRunning}
@@ -475,8 +700,36 @@ export default function App() {
               language="javascript"
               onRun={handleRun}
               onClear={handleClearEditor}
+              onShare={handleShareCode}
+              shareState={shareState}
               mode="ts"
               placeholder="Paste your TypeScript or drop a file"
+              isRunning={isRunning}
+            />
+          ) : mode === 'node' ? (
+            <CodeEditor
+              value={nodeCode}
+              onChange={setNodeCode}
+              language="javascript"
+              onRun={handleRun}
+              onClear={handleClearEditor}
+              onShare={handleShareCode}
+              shareState={shareState}
+              mode="node"
+              placeholder="Paste your Node.js code or drop a file"
+              isRunning={isRunning}
+            />
+          ) : mode === 'next' ? (
+            <CodeEditor
+              value={nextCode}
+              onChange={setNextCode}
+              language="javascript"
+              onRun={handleRun}
+              onClear={handleClearEditor}
+              onShare={handleShareCode}
+              shareState={shareState}
+              mode="next"
+              placeholder="Paste your Next.js / React component code"
               isRunning={isRunning}
             />
           ) : (
@@ -486,6 +739,8 @@ export default function App() {
               language={currentWebLanguage}
               onRun={handleRun}
               onClear={handleClearEditor}
+              onShare={handleShareCode}
+              shareState={shareState}
               mode="web"
               activeWebTab={activeWebTab}
               onSelectWebTab={setActiveWebTab}
@@ -522,9 +777,17 @@ export default function App() {
               : { width: `${100 - splitRatio}%`, height: '100%' }
           }
         >
-          {mode === 'js' || mode === 'ts' ? (
+          {mode === 'js' || mode === 'ts' || mode === 'node' || mode === 'next' ? (
             <ConsoleView
-              logs={mode === 'js' ? jsLogs : tsLogs}
+              logs={
+                mode === 'js'
+                  ? jsLogs
+                  : mode === 'ts'
+                  ? tsLogs
+                  : mode === 'node'
+                  ? nodeLogs
+                  : nextLogs
+              }
               onClear={handleClearConsole}
               onExecuteRepl={handleExecuteRepl}
               mode={mode}
@@ -561,36 +824,6 @@ export default function App() {
 
       {/* Developer Affiliate Sponsor Banner */}
       <SponsorBanner theme={theme} />
-
-      {/* Semantic Content for Crawlers, Bots & Search Engines */}
-      <article className="sr-only" aria-label="JS Playground and TypeScript Playground Documentation, Features, Guide, Keywords and FAQ">
-        <header>
-          <h1>JS Playground &amp; TypeScript Playground – Free Online JavaScript &amp; TypeScript Compiler</h1>
-          <p>
-            Welcome to JS Playground (jsplayground.js.org) and TypeScript Playground (jsplayground.js.org/typescript-playground).
-            Designed for engineers, front-end developers, learners, and competitive programmers,
-            this playground delivers zero-latency client-side JavaScript and TypeScript execution, an interactive
-            DevTools-grade console, top-level await support, and full HTML5/CSS3/JavaScript dual-mode web sandbox.
-          </p>
-        </header>
-
-        <section aria-labelledby="ts-section">
-          <h2>TypeScript Playground Online</h2>
-          <p>
-            Run TypeScript code online without installation. Test TypeScript interfaces, type annotations, generics, enums, and functions with real-time console output.
-          </p>
-        </section>
-
-        <nav aria-label="Legal and Documentation Pages">
-          <h2>Important Links</h2>
-          <ul>
-            <li><a href="/typescript-playground" onClick={(e) => { e.preventDefault(); navigate('/typescript-playground'); }}>TypeScript Playground</a></li>
-            <li><a href="/about" onClick={(e) => { e.preventDefault(); navigate('/about'); }}>About</a></li>
-            <li><a href="/privacy-policy" onClick={(e) => { e.preventDefault(); navigate('/privacy-policy'); }}>Privacy Policy</a></li>
-            <li><a href="/terms-of-service" onClick={(e) => { e.preventDefault(); navigate('/terms-of-service'); }}>Terms of Service</a></li>
-          </ul>
-        </nav>
-      </article>
     </div>
   );
 }
